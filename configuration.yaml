@@ -1,0 +1,210 @@
+# ══════════════════════════════════════════════════════════════
+#  configuration.yaml — Home Assistant Principal
+#  Dashboard Futurista  |  Versão 2.0
+# ══════════════════════════════════════════════════════════════
+
+# ── Dashboard Lovelace ────────────────────────────────────────
+lovelace:
+  mode: yaml
+  resources:
+    # Custom Cards — copie os .js para www/ e registre aqui
+    - url: /local/orbe-card.js
+      type: module
+    - url: /local/reminder-card.js
+      type: module
+    - url: /local/calendar-card.js
+      type: module
+    - url: /local/room-card.js
+      type: module
+    # HACS — instale via HACS antes de descomentar
+    # - url: /hacsfiles/mushroom/mushroom.js
+    #   type: module
+    # - url: /hacsfiles/apexcharts-card/apexcharts-card.js
+    #   type: module
+    # - url: /hacsfiles/layout-card/layout-card.js
+    #   type: module
+    # - url: /hacsfiles/card-mod/card-mod.js
+    #   type: module
+    # - url: /hacsfiles/mini-graph-card/mini-graph-card-bundle.js
+    #   type: module
+
+# ── Temas ────────────────────────────────────────────────────
+frontend:
+  themes: !include_dir_merge_named themes/
+  extra_module_url:
+    - /local/google-fonts-rajdhani.js  # Fonte Rajdhani (opcional)
+
+# ── Histórico & Log ──────────────────────────────────────────
+recorder:
+  purge_keep_days: 30
+  # SQLite (padrão — use para instalações simples):
+  db_url: sqlite:///config/home-assistant_v2.db
+  # PostgreSQL (recomendado para Docker/VPS — descomente quando usar):
+  # db_url: !secret db_url
+  # (no secrets.yaml: db_url: "postgresql://hauser:SENHA@localhost/homeassistant")
+  include:
+    domains:
+      - light
+      - switch
+      - sensor
+      - binary_sensor
+      - climate
+      - cover
+      - fan
+      - automation
+      - script
+
+history:
+  include:
+    domains:
+      - light
+      - switch
+      - sensor
+      - binary_sensor
+      - climate
+
+logbook:
+  include:
+    domains:
+      - light
+      - switch
+      - automation
+      - script
+      - climate
+
+# ── Helpers ──────────────────────────────────────────────────
+input_boolean:
+  # Modos da casa
+  modo_noturno:
+    name: "Modo Noturno"
+    icon: mdi:weather-night
+  modo_manha:
+    name: "Modo Manhã"
+    icon: mdi:weather-sunrise
+  modo_ausente:
+    name: "Modo Ausente"
+    icon: mdi:home-export-outline
+  alarme_ativo:
+    name: "Alarme Ativo"
+    icon: mdi:alarm
+  alerta_campainha:
+    name: "Alerta Campainha"
+    icon: mdi:doorbell
+
+input_text:
+  # Persistência de tarefas (sincroniza com reminder-card.js)
+  tarefas_json:
+    name: "Tarefas JSON"
+    max: 255
+  lembretes_json:
+    name: "Lembretes JSON"
+    max: 255
+  compras_json:
+    name: "Lista de Compras JSON"
+    max: 255
+
+input_number:
+  # Tarifa energia elétrica para cálculo de custo
+  tarifa_kwh:
+    name: "Tarifa R$/kWh"
+    min: 0.5
+    max: 2.0
+    step: 0.01
+    initial: 0.85
+    unit_of_measurement: "R$/kWh"
+    icon: mdi:currency-brl
+
+input_select:
+  modo_casa:
+    name: "Modo da Casa"
+    options:
+      - Normal
+      - Noturno
+      - Manhã
+      - Ausente
+      - Férias
+      - Cinema
+    initial: Normal
+    icon: mdi:home-circle
+
+# ── Sensores Template ─────────────────────────────────────────
+template:
+  - sensor:
+      # Saudação dinâmica
+      - name: "saudacao"
+        state: >
+          {% set hora = now().hour %}
+          {% if hora < 12 %}Bom dia{% elif hora < 18 %}Boa tarde{% else %}Boa noite{% endif %}
+        icon: mdi:hand-wave
+
+      # Dispositivos ligados (total)
+      - name: "dispositivos_ligados"
+        state: >
+          {{ states.light | selectattr('state','eq','on') | list | count
+           + states.switch | selectattr('state','eq','on') | list | count }}
+        unit_of_measurement: "dispositivos"
+        icon: mdi:power
+
+      # Custo estimado do mês
+      - name: "custo_mes_estimado"
+        state: >
+          {% set kwh = states('sensor.consumo_mes_kwh') | float(0) %}
+          {% set tarifa = states('input_number.tarifa_kwh') | float(0.85) %}
+          {{ (kwh * tarifa) | round(2) }}
+        unit_of_measurement: "R$"
+        icon: mdi:cash
+
+# ── Automações ───────────────────────────────────────────────
+automation: !include automations.yaml
+
+# ── Scripts ──────────────────────────────────────────────────
+script: !include_dir_merge_named scripts/
+
+# ── Notificações ─────────────────────────────────────────────
+# notify:
+#   - platform: alexa_media          # via HACS: Alexa Media Player
+#     name: alexa_media
+#   - platform: mobile_app            # via HA Companion App
+#     name: mobile_app_meu_celular
+
+# ── Calendário ───────────────────────────────────────────────
+# calendar:
+#   - platform: google                # requer integração Google Calendar
+#     client_id: !secret google_client_id
+#     client_secret: !secret google_client_secret
+
+# ── Lista de Compras ─────────────────────────────────────────
+shopping_list:
+
+# ── HTTP / CORS ──────────────────────────────────────────────
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 127.0.0.1
+    - ::1
+
+# ── InfluxDB — Métricas de longo prazo ───────────────────────
+# Requer InfluxDB 2.x rodando (via docker-compose)
+# Descomente quando o serviço InfluxDB estiver configurado:
+# influxdb:
+#   api_version: 2
+#   host: localhost
+#   port: 8086
+#   token: !secret influx_token
+#   organization: homeassistant
+#   bucket: ha_metrics
+#   include:
+#     entity_globs:
+#       - sensor.consumo_*
+#       - sensor.temperatura_*
+#       - sensor.umidade_*
+#       - sensor.huawei_*
+#       - sensor.custo_*
+
+# ── Segredos ─────────────────────────────────────────────────
+# secrets.yaml (NÃO committar no git):
+# db_url: "postgresql://hauser:SENHA@localhost/homeassistant"
+# influx_token: "seu-token-influxdb"
+# google_client_id: "seu-client-id"
+# google_client_secret: "seu-client-secret"
+# orbe_api_key: "sua-api-key-orbe"

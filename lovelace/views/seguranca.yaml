@@ -1,0 +1,411 @@
+# ══════════════════════════════════════════════════════════════
+#  VIEW: SEGURANÇA — Câmeras, Porteira & Frigate NVR
+#  Entidades placeholder: documentadas abaixo
+#  camera.camera_01 … camera_04 — substitua pelas suas câmeras
+#  binary_sensor.frigate_* — gerado pela integração Frigate
+#  lock.porteira — sua entidade de porteira
+# ══════════════════════════════════════════════════════════════
+
+- type: custom:mushroom-title-card
+  title: "🔒 Segurança"
+  subtitle: "Monitoramento ao vivo — câmeras, porteira e detecções"
+  card_mod:
+    style: |
+      ha-card { background: transparent !important; border: none !important; }
+
+# ── Status geral de segurança ─────────────────────────────────
+- type: horizontal-stack
+  cards:
+
+    - type: custom:mushroom-template-card
+      primary: >
+        {% if is_state('input_boolean.alarme_ativo','on') %}🛡️ Ativado{% else %}⚠️ Desativado{% endif %}
+      secondary: "Sistema de Alarme"
+      icon: >
+        {% if is_state('input_boolean.alarme_ativo','on') %}mdi:shield-check{% else %}mdi:shield-off{% endif %}
+      icon_color: >
+        {% if is_state('input_boolean.alarme_ativo','on') %}green{% else %}red{% endif %}
+      tap_action:
+        action: toggle
+        entity: input_boolean.alarme_ativo
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg,
+              {% if is_state('input_boolean.alarme_ativo','on') %}rgba(0,255,136,0.08){% else %}rgba(255,51,102,0.08){% endif %}
+              0%, transparent 100%) !important;
+            border: 1px solid
+              {% if is_state('input_boolean.alarme_ativo','on') %}rgba(0,255,136,0.3){% else %}rgba(255,51,102,0.3){% endif %}
+              !important;
+            animation: {% if is_state('input_boolean.alarme_ativo','on') %}none{% else %}pulse-red 2s infinite{% endif %};
+          }
+          @keyframes pulse-red {
+            0%, 100% { box-shadow: 0 0 8px rgba(255,51,102,0.2); }
+            50% { box-shadow: 0 0 24px rgba(255,51,102,0.6); }
+          }
+
+    - type: custom:mushroom-template-card
+      primary: "4 Câmeras"
+      secondary: >
+        {{ [states('binary_sensor.frigate_camera_01_motion'),
+            states('binary_sensor.frigate_camera_02_motion'),
+            states('binary_sensor.frigate_camera_03_motion'),
+            states('binary_sensor.frigate_camera_04_motion')]
+           | select('eq','on') | list | count }} com movimento
+      icon: mdi:cctv
+      icon_color: cyan
+
+    - type: custom:mushroom-template-card
+      primary: >
+        {% if is_state('lock.porteira','locked') %}🔒 Fechada{% else %}🔓 Aberta{% endif %}
+      secondary: "Porteira Eletrônica"
+      icon: mdi:gate
+      icon_color: >
+        {% if is_state('lock.porteira','locked') %}green{% else %}orange{% endif %}
+      tap_action:
+        action: call-service
+        service: lock.toggle
+        service_data:
+          entity_id: lock.porteira
+
+    - type: custom:mushroom-template-card
+      primary: >
+        {{ states('sensor.frigate_detections_today') | default('0') }} hoje
+      secondary: "Detecções Frigate"
+      icon: mdi:robot-excited
+      icon_color: purple
+
+# ══════════════════════════════════════════════════════════════
+#  LIVE VIEW — Grid de Câmeras
+# ══════════════════════════════════════════════════════════════
+
+- type: custom:mushroom-title-card
+  title: "📹 Câmeras ao Vivo"
+  subtitle: "Live view RTSP — clique para abrir em tela cheia"
+
+- type: grid
+  columns: 2
+  square: false
+  cards:
+
+    # Câmera 01 — Entrada
+    - type: picture-glance
+      title: "📷 Entrada"
+      entity: binary_sensor.frigate_camera_01_motion
+      camera_image: camera.camera_01   # ← Entidade da câmera RTSP
+      camera_view: live
+      tap_action:
+        action: call-service
+        service: camera.record
+        service_data:
+          entity_id: camera.camera_01
+          duration: 30
+      state_image:
+        "on": /local/icons/motion-detected.png
+        "off": /local/icons/no-motion.png
+      entities:
+        - entity: binary_sensor.frigate_camera_01_motion
+          icon: mdi:motion-sensor
+          tap_action:
+            action: more-info
+      card_mod:
+        style: |
+          ha-card {
+            border: 1px solid #1a2744 !important;
+            border-radius: 16px !important;
+            overflow: hidden;
+          }
+          ha-card.state-on {
+            border-color: rgba(255,51,102,0.6) !important;
+            box-shadow: 0 0 20px rgba(255,51,102,0.3) !important;
+          }
+
+    # Câmera 02 — Quintal
+    - type: picture-glance
+      title: "🌿 Quintal"
+      entity: binary_sensor.frigate_camera_02_motion
+      camera_image: camera.camera_02
+      camera_view: live
+      entities:
+        - entity: binary_sensor.frigate_camera_02_motion
+          icon: mdi:motion-sensor
+      card_mod:
+        style: |
+          ha-card {
+            border: 1px solid #1a2744 !important;
+            border-radius: 16px !important;
+            overflow: hidden;
+          }
+          ha-card.state-on {
+            border-color: rgba(255,51,102,0.6) !important;
+            box-shadow: 0 0 20px rgba(255,51,102,0.3) !important;
+          }
+
+    # Câmera 03 — Garagem
+    - type: picture-glance
+      title: "🚗 Garagem"
+      entity: binary_sensor.frigate_camera_03_motion
+      camera_image: camera.camera_03
+      camera_view: live
+      entities:
+        - entity: binary_sensor.frigate_camera_03_motion
+          icon: mdi:motion-sensor
+      card_mod:
+        style: |
+          ha-card {
+            border: 1px solid #1a2744 !important;
+            border-radius: 16px !important;
+            overflow: hidden;
+          }
+          ha-card.state-on {
+            border-color: rgba(255,51,102,0.6) !important;
+            box-shadow: 0 0 20px rgba(255,51,102,0.3) !important;
+          }
+
+    # Câmera 04 — Sala (interna)
+    - type: picture-glance
+      title: "🛋️ Sala Interna"
+      entity: binary_sensor.frigate_camera_04_motion
+      camera_image: camera.camera_04
+      camera_view: live
+      entities:
+        - entity: binary_sensor.frigate_camera_04_motion
+          icon: mdi:motion-sensor
+      card_mod:
+        style: |
+          ha-card {
+            border: 1px solid #1a2744 !important;
+            border-radius: 16px !important;
+            overflow: hidden;
+          }
+          ha-card.state-on {
+            border-color: rgba(255,51,102,0.6) !important;
+            box-shadow: 0 0 20px rgba(255,51,102,0.3) !important;
+          }
+
+# ══════════════════════════════════════════════════════════════
+#  PORTEIRA ELETRÔNICA
+# ══════════════════════════════════════════════════════════════
+
+- type: custom:mushroom-title-card
+  title: "🚪 Porteira Eletrônica"
+  subtitle: "Controle e histórico de acionamentos"
+
+- type: horizontal-stack
+  cards:
+
+    # Controle da porteira
+    - type: vertical-stack
+      cards:
+        - type: custom:mushroom-template-card
+          primary: >
+            {% if is_state('lock.porteira','locked') %}🔒 Porteira Fechada{% else %}🔓 Porteira Aberta{% endif %}
+          secondary: >
+            Última abertura: {{ states.lock.porteira.last_changed | as_datetime | as_local | relative_time }}
+          icon: mdi:gate
+          icon_color: >
+            {% if is_state('lock.porteira','locked') %}green{% else %}red{% endif %}
+
+        - type: horizontal-stack
+          cards:
+            - type: button
+              name: "🔓 Abrir"
+              icon: mdi:lock-open-variant
+              tap_action:
+                action: call-service
+                service: lock.unlock
+                service_data:
+                  entity_id: lock.porteira
+              hold_action:
+                action: call-service
+                service: lock.unlock
+                service_data:
+                  entity_id: lock.porteira
+              card_mod:
+                style: |
+                  ha-card {
+                    background: linear-gradient(135deg, rgba(255,51,102,0.15) 0%, rgba(255,51,102,0.05) 100%) !important;
+                    border: 1px solid rgba(255,51,102,0.4) !important;
+                  }
+                  ha-card:hover { box-shadow: 0 0 20px rgba(255,51,102,0.4) !important; }
+
+            - type: button
+              name: "🔒 Fechar"
+              icon: mdi:lock
+              tap_action:
+                action: call-service
+                service: lock.lock
+                service_data:
+                  entity_id: lock.porteira
+              card_mod:
+                style: |
+                  ha-card {
+                    background: linear-gradient(135deg, rgba(0,255,136,0.15) 0%, rgba(0,255,136,0.05) 100%) !important;
+                    border: 1px solid rgba(0,255,136,0.4) !important;
+                  }
+                  ha-card:hover { box-shadow: 0 0 20px rgba(0,255,136,0.4) !important; }
+
+    # Log de acionamentos (via logbook)
+    - type: logbook
+      entities:
+        - lock.porteira
+        - input_boolean.alarme_ativo
+      hours_to_show: 24
+      title: "📋 Log — Últimas 24h"
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, #0d1321 0%, #111827 100%) !important;
+            border: 1px solid #1a2744 !important;
+            max-height: 250px;
+            overflow-y: auto;
+          }
+
+# ══════════════════════════════════════════════════════════════
+#  FRIGATE NVR — Detecções Recentes
+# ══════════════════════════════════════════════════════════════
+
+- type: custom:mushroom-title-card
+  title: "🤖 Frigate NVR — Detecções por IA"
+  subtitle: "Reconhecimento de objeto em tempo real"
+
+- type: horizontal-stack
+  cards:
+
+    # Contadores de detecção por categoria
+    - type: custom:mushroom-template-card
+      primary: "{{ states('sensor.frigate_person_count') | default('0') }}"
+      secondary: "👤 Pessoas Detectadas Hoje"
+      icon: mdi:account-multiple
+      icon_color: cyan
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(0,212,255,0.08) 0%, transparent 100%) !important;
+            border: 1px solid rgba(0,212,255,0.2) !important;
+          }
+          .primary { font-size: 2rem !important; font-weight: 700; color: #00d4ff !important; }
+
+    - type: custom:mushroom-template-card
+      primary: "{{ states('sensor.frigate_car_count') | default('0') }}"
+      secondary: "🚗 Carros Detectados Hoje"
+      icon: mdi:car
+      icon_color: purple
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(123,47,255,0.08) 0%, transparent 100%) !important;
+            border: 1px solid rgba(123,47,255,0.2) !important;
+          }
+          .primary { font-size: 2rem !important; font-weight: 700; color: #7b2fff !important; }
+
+    - type: custom:mushroom-template-card
+      primary: "{{ states('sensor.frigate_animal_count') | default('0') }}"
+      secondary: "🐾 Animais Detectados Hoje"
+      icon: mdi:paw
+      icon_color: green
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(0,255,136,0.08) 0%, transparent 100%) !important;
+            border: 1px solid rgba(0,255,136,0.2) !important;
+          }
+          .primary { font-size: 2rem !important; font-weight: 700; color: #00ff88 !important; }
+
+# Feed de detecções recentes Frigate
+- type: vertical-stack
+  title: "📸 Detecções Recentes"
+  cards:
+
+    # Miniaturas das últimas detecções — Pessoa
+    - type: conditional
+      conditions:
+        - entity: binary_sensor.frigate_camera_01_person
+          state: "on"
+      card:
+        type: picture-entity
+        entity: camera.frigate_camera_01_person
+        name: "👤 Pessoa — Câmera Entrada"
+        show_state: true
+        card_mod:
+          style: |
+            ha-card {
+              border: 2px solid rgba(255,51,102,0.6) !important;
+              box-shadow: 0 0 20px rgba(255,51,102,0.3) !important;
+              animation: pulse-red 1.5s infinite;
+            }
+            @keyframes pulse-red {
+              0%, 100% { box-shadow: 0 0 8px rgba(255,51,102,0.3); }
+              50% { box-shadow: 0 0 24px rgba(255,51,102,0.8); }
+            }
+
+    # Card de eventos Frigate (usando custom:frigate-card se instalado)
+    # Alternativa: usar picture-glance com câmera de snapshot
+    - type: picture-entity
+      entity: camera.frigate_latest_detection
+      name: "Última Detecção"
+      show_state: true
+      card_mod:
+        style: |
+          ha-card {
+            border: 1px solid #1a2744 !important;
+            border-radius: 16px !important;
+            overflow: hidden;
+          }
+
+# ── Alertas de Movimento por Zona ────────────────────────────
+- type: custom:mushroom-title-card
+  title: "⚠️ Alertas de Movimento por Zona"
+
+- type: horizontal-stack
+  cards:
+
+    - type: custom:mushroom-template-card
+      primary: "Zona: Entrada"
+      secondary: >
+        {% if is_state('binary_sensor.frigate_camera_01_motion','on') %}
+          🔴 MOVIMENTO DETECTADO | {{ states.binary_sensor.frigate_camera_01_motion.last_changed | as_datetime | as_local | relative_time }}
+        {% else %}
+          ✅ Sem movimento | {{ states.binary_sensor.frigate_camera_01_motion.last_changed | as_datetime | as_local | relative_time }}
+        {% endif %}
+      icon: mdi:door-open
+      icon_color: >
+        {% if is_state('binary_sensor.frigate_camera_01_motion','on') %}red{% else %}green{% endif %}
+      card_mod:
+        style: |
+          ha-card {
+            {% if is_state('binary_sensor.frigate_camera_01_motion','on') %}
+            border: 1px solid rgba(255,51,102,0.5) !important;
+            animation: pulse-alert 1s infinite;
+            {% else %}
+            border: 1px solid rgba(0,255,136,0.2) !important;
+            {% endif %}
+          }
+          @keyframes pulse-alert {
+            0%, 100% { background: rgba(255,51,102,0.05); }
+            50% { background: rgba(255,51,102,0.15); }
+          }
+
+    - type: custom:mushroom-template-card
+      primary: "Zona: Quintal"
+      secondary: >
+        {% if is_state('binary_sensor.frigate_camera_02_motion','on') %}
+          🔴 MOVIMENTO | {{ states.binary_sensor.frigate_camera_02_motion.last_changed | as_datetime | as_local | relative_time }}
+        {% else %}
+          ✅ Livre | {{ states.binary_sensor.frigate_camera_02_motion.last_changed | as_datetime | as_local | relative_time }}
+        {% endif %}
+      icon: mdi:tree
+      icon_color: >
+        {% if is_state('binary_sensor.frigate_camera_02_motion','on') %}red{% else %}green{% endif %}
+
+    - type: custom:mushroom-template-card
+      primary: "Zona: Garagem"
+      secondary: >
+        {% if is_state('binary_sensor.frigate_camera_03_motion','on') %}
+          🔴 MOVIMENTO | {{ states.binary_sensor.frigate_camera_03_motion.last_changed | as_datetime | as_local | relative_time }}
+        {% else %}
+          ✅ Livre | {{ states.binary_sensor.frigate_camera_03_motion.last_changed | as_datetime | as_local | relative_time }}
+        {% endif %}
+      icon: mdi:garage
+      icon_color: >
+        {% if is_state('binary_sensor.frigate_camera_03_motion','on') %}red{% else %}green{% endif %}

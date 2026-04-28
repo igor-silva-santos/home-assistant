@@ -1,0 +1,67 @@
+# ══════════════════════════════════════════════════════════════
+#  ui-lovelace.yaml — Dashboard Futurista Home Assistant
+#  Versão: 2.0  |  Layout: Tablet-first, responsivo
+# ══════════════════════════════════════════════════════════════
+
+title: "🏠 Casa Inteligente"
+
+# ── Configurações globais ─────────────────────────────────────
+background: |
+  radial-gradient(ellipse at 20% 50%, rgba(0, 212, 255, 0.03) 0%, transparent 50%),
+  radial-gradient(ellipse at 80% 20%, rgba(123, 47, 255, 0.03) 0%, transparent 50%),
+  #070b14
+
+# ── Recursos extras (fallback se não configurado no config.yaml)
+# resources: []  # já declarados em configuration.yaml
+
+# ══════════════════════════════════════════════════════════════
+#  VIEWS / ABAS
+# ══════════════════════════════════════════════════════════════
+views:
+
+  # ── 1. Home ───────────────────────────────────────────────
+  - title: "Home"
+    path: home
+    icon: mdi:home-variant
+    type: custom:grid-layout
+    layout:
+      grid-template-columns: 1fr
+      grid-template-rows: auto
+    cards: !include lovelace/views/home.yaml
+
+  # ── 2. Cômodos ────────────────────────────────────────────
+  - title: "Cômodos"
+    path: comodos
+    icon: mdi:floor-plan
+    cards: !include lovelace/views/comodos.yaml
+
+  # ── 3. Energia ────────────────────────────────────────────
+  - title: "Energia"
+    path: energia
+    icon: mdi:lightning-bolt
+    panel: false
+    cards: !include lovelace/views/energia.yaml
+
+  # ── 4. Relatórios ─────────────────────────────────────────
+  - title: "Relatórios"
+    path: relatorios
+    icon: mdi:chart-bar
+    cards: !include lovelace/views/relatorios.yaml
+
+  # ── 5. Automações ─────────────────────────────────────────
+  - title: "Automações"
+    path: automacoes
+    icon: mdi:robot
+    cards: !include lovelace/views/automacoes.yaml
+
+  # ── 6. Segurança ──────────────────────────────────────────
+  - title: "Segurança"
+    path: seguranca
+    icon: mdi:shield-home
+    cards: !include lovelace/views/seguranca.yaml
+
+  # ── 7. Config ─────────────────────────────────────────────
+  - title: "Config"
+    path: config
+    icon: mdi:cog
+    cards: !include lovelace/views/config.yaml

@@ -1,0 +1,217 @@
+# ══════════════════════════════════════════════════════════════
+#  VIEW: AUTOMAÇÕES — Controle de Automações
+# ══════════════════════════════════════════════════════════════
+
+- type: custom:mushroom-title-card
+  title: "🤖 Automações"
+  subtitle: "Gerencie todas as automações da sua casa"
+  card_mod:
+    style: |
+      ha-card { background: transparent !important; border: none !important; }
+
+# ── Automações principais ────────────────────────────────────
+- type: custom:mushroom-title-card
+  title: "💡 Luzes & Conforto"
+  subtitle: "Automações de iluminação e ambiente"
+
+- type: vertical-stack
+  cards:
+
+    # 1. Desligar luzes sem movimento
+    - type: custom:mushroom-template-card
+      primary: "Luzes OFF — Sem Movimento"
+      secondary: >
+        {% set auto = states.automation.desligar_luzes_sem_movimento %}
+        Última execução: {{ auto.attributes.last_triggered | as_datetime | as_local | relative_time if auto.attributes.last_triggered else 'Nunca' }}
+        | 30 min sem movimento → apaga luzes
+      icon: mdi:motion-sensor-off
+      icon_color: >
+        {% if is_state('automation.desligar_luzes_sem_movimento','on') %}cyan{% else %}disabled{% endif %}
+      badge_icon: >
+        {% if is_state('automation.desligar_luzes_sem_movimento','on') %}mdi:check-circle{% else %}mdi:pause-circle{% endif %}
+      badge_color: >
+        {% if is_state('automation.desligar_luzes_sem_movimento','on') %}green{% else %}gray{% endif %}
+      tap_action:
+        action: call-service
+        service: automation.toggle
+        service_data:
+          entity_id: automation.desligar_luzes_sem_movimento
+      hold_action:
+        action: call-service
+        service: automation.trigger
+        service_data:
+          entity_id: automation.desligar_luzes_sem_movimento
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(0,212,255,0.05) 0%, transparent 100%) !important;
+            border: 1px solid rgba(0,212,255,0.1) !important;
+            cursor: pointer;
+          }
+          ha-card:hover { border-color: rgba(0,212,255,0.4) !important; }
+
+    # 2. Modo noturno
+    - type: custom:mushroom-template-card
+      primary: "Modo Noturno"
+      secondary: >
+        {% set auto = states.automation.modo_noturno %}
+        Última execução: {{ auto.attributes.last_triggered | as_datetime | as_local | relative_time if auto.attributes.last_triggered else 'Nunca' }}
+        | 23:00 → dimmer luzes + silêncio + modo escuro
+      icon: mdi:weather-night
+      icon_color: >
+        {% if is_state('automation.modo_noturno','on') %}purple{% else %}disabled{% endif %}
+      badge_icon: >
+        {% if is_state('automation.modo_noturno','on') %}mdi:check-circle{% else %}mdi:pause-circle{% endif %}
+      badge_color: >
+        {% if is_state('automation.modo_noturno','on') %}green{% else %}gray{% endif %}
+      tap_action:
+        action: call-service
+        service: automation.toggle
+        service_data:
+          entity_id: automation.modo_noturno
+      hold_action:
+        action: call-service
+        service: automation.trigger
+        service_data:
+          entity_id: automation.modo_noturno
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(123,47,255,0.05) 0%, transparent 100%) !important;
+            border: 1px solid rgba(123,47,255,0.1) !important;
+            cursor: pointer;
+          }
+
+    # 3. Modo manhã
+    - type: custom:mushroom-template-card
+      primary: "Modo Manhã"
+      secondary: >
+        {% set auto = states.automation.modo_manha %}
+        Última execução: {{ auto.attributes.last_triggered | as_datetime | as_local | relative_time if auto.attributes.last_triggered else 'Nunca' }}
+        | 07:00 → luzes gradual + clima + notícia do dia
+      icon: mdi:weather-sunrise
+      icon_color: >
+        {% if is_state('automation.modo_manha','on') %}gold{% else %}disabled{% endif %}
+      badge_icon: >
+        {% if is_state('automation.modo_manha','on') %}mdi:check-circle{% else %}mdi:pause-circle{% endif %}
+      badge_color: >
+        {% if is_state('automation.modo_manha','on') %}green{% else %}gray{% endif %}
+      tap_action:
+        action: call-service
+        service: automation.toggle
+        service_data:
+          entity_id: automation.modo_manha
+      hold_action:
+        action: call-service
+        service: automation.trigger
+        service_data:
+          entity_id: automation.modo_manha
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(255,215,0,0.05) 0%, transparent 100%) !important;
+            border: 1px solid rgba(255,215,0,0.1) !important;
+            cursor: pointer;
+          }
+
+- type: custom:mushroom-title-card
+  title: "⚡ Energia & Alertas"
+  subtitle: "Monitoramento inteligente de consumo"
+
+- type: vertical-stack
+  cards:
+
+    # 4. Alerta de consumo anômalo
+    - type: custom:mushroom-template-card
+      primary: "Alerta Consumo Alto"
+      secondary: >
+        {% set auto = states.automation.alerta_consumo_anomalo %}
+        Última execução: {{ auto.attributes.last_triggered | as_datetime | as_local | relative_time if auto.attributes.last_triggered else 'Nunca' }}
+        | Notifica quando consumo > 20% acima da média
+      icon: mdi:alert-octagon
+      icon_color: >
+        {% if is_state('automation.alerta_consumo_anomalo','on') %}red{% else %}disabled{% endif %}
+      tap_action:
+        action: call-service
+        service: automation.toggle
+        service_data:
+          entity_id: automation.alerta_consumo_anomalo
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(255,51,102,0.05) 0%, transparent 100%) !important;
+            border: 1px solid rgba(255,51,102,0.1) !important;
+            cursor: pointer;
+          }
+
+- type: custom:mushroom-title-card
+  title: "🎙️ Alexa & Integração"
+  subtitle: "Sincronização com Amazon Alexa"
+
+- type: vertical-stack
+  cards:
+
+    # 5. Sync lista de compras
+    - type: custom:mushroom-template-card
+      primary: "Sync Lista de Compras → Alexa"
+      secondary: >
+        {% set auto = states.automation.sync_lista_compras_alexa %}
+        Última execução: {{ auto.attributes.last_triggered | as_datetime | as_local | relative_time if auto.attributes.last_triggered else 'Nunca' }}
+        | Sincroniza shopping_list com Alexa a cada hora
+      icon: mdi:shopping
+      icon_color: >
+        {% if is_state('automation.sync_lista_compras_alexa','on') %}green{% else %}disabled{% endif %}
+      tap_action:
+        action: call-service
+        service: automation.toggle
+        service_data:
+          entity_id: automation.sync_lista_compras_alexa
+      hold_action:
+        action: call-service
+        service: automation.trigger
+        service_data:
+          entity_id: automation.sync_lista_compras_alexa
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(0,255,136,0.05) 0%, transparent 100%) !important;
+            border: 1px solid rgba(0,255,136,0.1) !important;
+            cursor: pointer;
+          }
+
+    # 6. Notificações de lembrete
+    - type: custom:mushroom-template-card
+      primary: "Notificações de Lembrete"
+      secondary: >
+        {% set auto = states.automation.notificacao_lembrete %}
+        Última execução: {{ auto.attributes.last_triggered | as_datetime | as_local | relative_time if auto.attributes.last_triggered else 'Nunca' }}
+        | Dispara notify + Alexa nos horários configurados
+      icon: mdi:bell-ring
+      icon_color: >
+        {% if is_state('automation.notificacao_lembrete','on') %}cyan{% else %}disabled{% endif %}
+      tap_action:
+        action: call-service
+        service: automation.toggle
+        service_data:
+          entity_id: automation.notificacao_lembrete
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(0,212,255,0.05) 0%, transparent 100%) !important;
+            border: 1px solid rgba(0,212,255,0.1) !important;
+            cursor: pointer;
+          }
+
+# ── Dica de uso ───────────────────────────────────────────────
+- type: custom:mushroom-template-card
+  primary: "💡 Dica"
+  secondary: "Toque para ativar/desativar | Segure para executar agora"
+  icon: mdi:information
+  icon_color: cyan
+  card_mod:
+    style: |
+      ha-card {
+        background: rgba(0,212,255,0.03) !important;
+        border: 1px dashed rgba(0,212,255,0.2) !important;
+      }
+      .primary { color: #00d4ff !important; }

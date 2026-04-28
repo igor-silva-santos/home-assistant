@@ -1,0 +1,90 @@
+# ══════════════════════════════════════════════════════════════
+#  .coolify.yml — Configuração para deploy no Coolify
+#  Home Assistant Futuristic Dashboard
+# ══════════════════════════════════════════════════════════════
+
+version: "1"
+
+project:
+  name: "ha-futuristic-dashboard"
+  description: "Home Assistant com Dashboard Futurista — Igor Silva"
+
+# ── Build ─────────────────────────────────────────────────────
+build:
+  dockerfile: Dockerfile
+  context: "."
+  args:
+    BUILD_DATE: "{{ .BuildDate }}"
+    VERSION: "2.0"
+
+# ── Deploy ────────────────────────────────────────────────────
+deploy:
+  replicas: 1
+  strategy: recreate          # HA não suporta rolling update
+  health_check:
+    path: /api/
+    port: 8123
+    interval: 30s
+    timeout: 10s
+    retries: 5
+    start_period: 90s
+
+# ── Serviços (referencia o docker-compose.yml) ───────────────
+services:
+  - homeassistant
+  - db
+  - influxdb
+  - grafana
+  - frigate
+  - redis
+
+# ── Variáveis de ambiente ─────────────────────────────────────
+env:
+  required:
+    - DB_PASSWORD
+    - INFLUX_PASSWORD
+    - GRAFANA_PASSWORD
+    - REDIS_PASSWORD
+    - HA_DOMAIN
+  optional:
+    - TZ
+    - ORBE_API_KEY
+    - FRIGATE_RTSP_PASSWORD
+    - INFLUX_TOKEN
+    - LETSENCRYPT_EMAIL
+
+# ── Domínios e SSL ────────────────────────────────────────────
+domains:
+  - domain: "{{ env.HA_DOMAIN }}"
+    service: homeassistant
+    port: 8123
+    ssl: true
+    redirect_http: true
+  - domain: "{{ env.GRAFANA_DOMAIN }}"
+    service: grafana
+    port: 3000
+    ssl: true
+
+# ── Volumes (persistência) ─────────────────────────────────────
+volumes:
+  postgres_data:
+    driver: local
+    persistent: true
+  influxdb_data:
+    driver: local
+    persistent: true
+  grafana_data:
+    driver: local
+    persistent: true
+  redis_data:
+    driver: local
+    persistent: true
+
+# ── Notificações de deploy ────────────────────────────────────
+notifications:
+  on_deploy:
+    - type: webhook
+      url: "{{ env.DEPLOY_WEBHOOK_URL | default('') }}"
+  on_failure:
+    - type: email
+      to: "{{ env.LETSENCRYPT_EMAIL }}"

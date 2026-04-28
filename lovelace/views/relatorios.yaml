@@ -1,0 +1,477 @@
+# ══════════════════════════════════════════════════════════════
+#  VIEW: RELATÓRIOS — Análise Inteligente
+# ══════════════════════════════════════════════════════════════
+
+- type: custom:mushroom-title-card
+  title: "📊 Relatórios Inteligentes"
+  subtitle: "Análise completa do uso da sua casa"
+  card_mod:
+    style: |
+      ha-card { background: transparent !important; border: none !important; }
+
+# ── Abas de Relatório ─────────────────────────────────────────
+- type: vertical-stack
+  cards:
+    - type: custom:tabbed-card
+      styles:
+        "--tabbed-card-tab-color": "#8892b0"
+        "--tabbed-card-tab-active-color": "#00d4ff"
+        "--tabbed-card-background": "#0d1321"
+      tabs:
+
+        # ── Relatório Diário ─────────────────────────────
+        - label: "📅 Diário"
+          card:
+            type: vertical-stack
+            cards:
+
+              - type: custom:mushroom-title-card
+                title: "Resumo de Hoje"
+                subtitle: "{{ now().strftime('%d/%m/%Y') }}"
+
+              - type: horizontal-stack
+                cards:
+                  - type: custom:mushroom-template-card
+                    primary: "{{ states('sensor.consumo_diario_kwh') | round(2) }} kWh"
+                    secondary: "Consumo do Dia"
+                    icon: mdi:flash
+                    icon_color: cyan
+                  - type: custom:mushroom-template-card
+                    primary: "{{ states('sensor.dispositivos_ligados') }}"
+                    secondary: "Dispositivos Usados"
+                    icon: mdi:devices
+                    icon_color: purple
+                  - type: custom:mushroom-template-card
+                    primary: "0 / 5"
+                    secondary: "Tarefas Concluídas"
+                    icon: mdi:check-circle
+                    icon_color: green
+
+              - type: custom:apexcharts-card
+                header: { show: true, title: "Uso de Dispositivos — Hoje" }
+                graph_span: 24h
+                apex_config:
+                  chart:
+                    type: rangeBar
+                    height: 200
+                    background: transparent
+                    toolbar: { show: false }
+                  theme: { mode: dark }
+                  colors: ["#00d4ff", "#7b2fff", "#00ff88", "#ffd700"]
+                  plotOptions:
+                    bar:
+                      horizontal: true
+                      borderRadius: 4
+                  grid: { borderColor: "rgba(26,39,68,0.8)" }
+                  xaxis:
+                    type: datetime
+                    labels:
+                      format: "HH:mm"
+                      style: { colors: "#8892b0" }
+                  yaxis:
+                    labels: { style: { colors: "#8892b0" } }
+                  tooltip: { theme: dark }
+                series:
+                  - entity: binary_sensor.tv_sala_ligada
+                    name: "TV Sala"
+                    type: rangeBar
+                  - entity: binary_sensor.computador_ligado
+                    name: "Computador"
+                    type: rangeBar
+                  - entity: binary_sensor.ar_condicionado_ligado
+                    name: "Ar Condicionado"
+                    type: rangeBar
+
+        # ── Relatório Semanal ────────────────────────────
+        - label: "📆 Semanal"
+          card:
+            type: vertical-stack
+            cards:
+
+              - type: custom:mushroom-title-card
+                title: "Semana Atual"
+                subtitle: "Comparativo com semana anterior"
+
+              - type: custom:apexcharts-card
+                header: { show: true, title: "Consumo por Dia — Esta Semana vs Semana Passada" }
+                graph_span: 14d
+                apex_config:
+                  chart:
+                    type: bar
+                    height: 220
+                    background: transparent
+                    toolbar: { show: false }
+                  theme: { mode: dark }
+                  colors: ["#00d4ff", "#3d4a6b"]
+                  plotOptions:
+                    bar:
+                      borderRadius: 6
+                      columnWidth: "40%"
+                  dataLabels: { enabled: false }
+                  grid: { borderColor: "rgba(26,39,68,0.8)" }
+                  xaxis:
+                    type: datetime
+                    labels:
+                      format: "EEE"
+                      style: { colors: "#8892b0" }
+                  yaxis:
+                    labels:
+                      formatter: "function(v){return v.toFixed(1)+' kWh'}"
+                      style: { colors: "#8892b0" }
+                  tooltip: { theme: dark }
+                  legend: { labels: { colors: "#8892b0" } }
+                series:
+                  - entity: sensor.consumo_diario_kwh
+                    name: "Esta Semana"
+                    color: "#00d4ff"
+                    statistics: { type: sum, period: day }
+                  - entity: sensor.consumo_semana_passada_kwh
+                    name: "Semana Passada"
+                    color: "#3d4a6b"
+
+        # ── Relatório Mensal ─────────────────────────────
+        - label: "📅 Mensal"
+          card:
+            type: vertical-stack
+            cards:
+
+              - type: custom:mushroom-title-card
+                title: "Mês Atual"
+                subtitle: "Tendência e custo"
+
+              - type: horizontal-stack
+                cards:
+                  - type: custom:mushroom-template-card
+                    primary: "{{ states('sensor.consumo_mes_kwh') | round(1) }} kWh"
+                    secondary: "Total do Mês"
+                    icon: mdi:flash
+                    icon_color: cyan
+                  - type: custom:mushroom-template-card
+                    primary: "R$ {{ states('sensor.custo_mes_estimado') }}"
+                    secondary: "Custo Estimado"
+                    icon: mdi:cash
+                    icon_color: gold
+                  - type: custom:mushroom-template-card
+                    primary: "{{ ((states('sensor.consumo_mes_kwh')|float / 30) * (30 - now().day + (now().day - 1))) | round(1) }} kWh"
+                    secondary: "Projeção Final"
+                    icon: mdi:chart-line-variant
+                    icon_color: purple
+
+              - type: custom:apexcharts-card
+                header: { show: true, title: "Consumo Diário — Este Mês" }
+                graph_span: 30d
+                apex_config:
+                  chart:
+                    type: area
+                    height: 200
+                    background: transparent
+                    toolbar: { show: false }
+                  theme: { mode: dark }
+                  colors: ["#7b2fff"]
+                  fill:
+                    type: gradient
+                    gradient:
+                      shade: dark
+                      opacityFrom: 0.6
+                      opacityTo: 0.05
+                  stroke: { curve: smooth, width: 2 }
+                  grid: { borderColor: "rgba(26,39,68,0.8)" }
+                  xaxis:
+                    type: datetime
+                    labels: { format: "dd", style: { colors: "#8892b0" } }
+                  yaxis:
+                    labels:
+                      formatter: "function(v){return v.toFixed(1)}"
+                      style: { colors: "#8892b0" }
+                  tooltip: { theme: dark }
+                series:
+                  - entity: sensor.consumo_diario_kwh
+                    name: "kWh/dia"
+                    statistics: { type: sum, period: day }
+
+        # ── Por Dispositivo ──────────────────────────────
+        - label: "🔌 Por Dispositivo"
+          card:
+            type: vertical-stack
+            cards:
+
+              - type: custom:mushroom-title-card
+                title: "Histórico por Dispositivo"
+                subtitle: "Selecione para ver estatísticas"
+
+              - type: entities
+                entities:
+                  - entity: sensor.consumo_ar_condicionado
+                    name: "Ar Condicionado"
+                    icon: mdi:air-conditioner
+                    secondary_info: last-changed
+                  - entity: sensor.consumo_geladeira
+                    name: "Geladeira"
+                    icon: mdi:fridge
+                    secondary_info: last-changed
+                  - entity: sensor.consumo_tv_sala
+                    name: "TV Sala"
+                    icon: mdi:television
+                    secondary_info: last-changed
+                  - entity: sensor.consumo_computador
+                    name: "Computador"
+                    icon: mdi:desktop-tower
+                    secondary_info: last-changed
+                  - entity: sensor.consumo_lava_loucas
+                    name: "Lava-louças"
+                    icon: mdi:dishwasher
+                    secondary_info: last-changed
+
+# ── Cards de Insight Automático ───────────────────────────────
+- type: custom:mushroom-title-card
+  title: "💡 Insights Automáticos"
+  subtitle: "Sugestões inteligentes baseadas nos seus hábitos"
+
+- type: conditional
+  conditions:
+    - entity: binary_sensor.luz_cozinha_sem_movimento
+      state: "on"
+  card:
+    type: custom:mushroom-template-card
+    primary: "💡 Luz da Cozinha"
+    secondary: "Você deixou a luz da cozinha ligada há mais de 3h sem movimento detectado"
+    icon: mdi:lightbulb-alert
+    icon_color: orange
+    badge_icon: mdi:alert
+    badge_color: orange
+    tap_action:
+      action: call-service
+      service: light.turn_off
+      service_data:
+        entity_id: light.cozinha
+    card_mod:
+      style: |
+        ha-card {
+          background: linear-gradient(135deg, rgba(255,165,0,0.1) 0%, transparent 100%) !important;
+          border: 1px solid rgba(255,165,0,0.3) !important;
+          animation: pulse-orange 2s infinite;
+        }
+        @keyframes pulse-orange {
+          0%, 100% { box-shadow: 0 0 8px rgba(255,165,0,0.3); }
+          50% { box-shadow: 0 0 20px rgba(255,165,0,0.6); }
+        }
+
+- type: custom:mushroom-template-card
+  primary: "📈 Consumo Acima da Média"
+  secondary: >
+    {% set atual = states('sensor.consumo_diario_kwh') | float(0) %}
+    {% set media = states('sensor.consumo_medio_diario_kwh') | float(1) %}
+    {% set diff = ((atual - media) / media * 100) | round(0) %}
+    {% if diff > 0 %}Consumo {{ diff }}% acima da média semanal ({{ media | round(2) }} kWh/dia){% else %}✅ Consumo dentro da média{% endif %}
+  icon: >
+    {% set atual = states('sensor.consumo_diario_kwh') | float(0) %}
+    {% set media = states('sensor.consumo_medio_diario_kwh') | float(1) %}
+    {% if atual > media * 1.15 %}mdi:trending-up{% else %}mdi:trending-neutral{% endif %}
+  icon_color: >
+    {% set atual = states('sensor.consumo_diario_kwh') | float(0) %}
+    {% set media = states('sensor.consumo_medio_diario_kwh') | float(1) %}
+    {% if atual > media * 1.15 %}red{% elif atual > media * 1.05 %}orange{% else %}green{% endif %}
+
+# ══════════════════════════════════════════════════════════════
+#  BLOCO EXTRA: 📡 REDE — Huawei Mesh
+# ══════════════════════════════════════════════════════════════
+
+- type: custom:mushroom-title-card
+  title: "📡 Rede — Huawei Mesh"
+  subtitle: "Monitoramento da rede doméstica em tempo real"
+  card_mod:
+    style: |
+      ha-card {
+        background: transparent !important;
+        border: none !important;
+        margin-top: 24px !important;
+      }
+
+# KPIs de Rede
+- type: horizontal-stack
+  cards:
+
+    - type: custom:mushroom-template-card
+      primary: "{{ states('sensor.huawei_connected_devices') }}"
+      secondary: "📱 Dispositivos Conectados"
+      icon: mdi:devices
+      icon_color: cyan
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(0,212,255,0.08) 0%, rgba(0,212,255,0.02) 100%) !important;
+            border: 1px solid rgba(0,212,255,0.25) !important;
+          }
+          .primary { font-size: 2rem !important; font-weight: 700; color: #00d4ff !important; }
+
+    - type: custom:mushroom-template-card
+      primary: "{{ states('sensor.huawei_download_speed') | round(1) }} Mbps"
+      secondary: "⬇️ Download Atual"
+      icon: mdi:download-network
+      icon_color: green
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(0,255,136,0.08) 0%, rgba(0,255,136,0.02) 100%) !important;
+            border: 1px solid rgba(0,255,136,0.25) !important;
+          }
+          .primary { font-size: 1.6rem !important; font-weight: 700; color: #00ff88 !important; }
+
+    - type: custom:mushroom-template-card
+      primary: "{{ states('sensor.huawei_upload_speed') | round(1) }} Mbps"
+      secondary: "⬆️ Upload Atual"
+      icon: mdi:upload-network
+      icon_color: purple
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(123,47,255,0.08) 0%, rgba(123,47,255,0.02) 100%) !important;
+            border: 1px solid rgba(123,47,255,0.25) !important;
+          }
+          .primary { font-size: 1.6rem !important; font-weight: 700; color: #7b2fff !important; }
+
+    - type: custom:mushroom-template-card
+      primary: >
+        {% if is_state('binary_sensor.huawei_node_principal','on') %}✅ Online{% else %}❌ Offline{% endif %}
+      secondary: "🌐 Nó Principal"
+      icon: mdi:router-wireless
+      icon_color: >
+        {% if is_state('binary_sensor.huawei_node_principal','on') %}green{% else %}red{% endif %}
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(0,255,136,0.06) 0%, transparent 100%) !important;
+            border: 1px solid rgba(0,255,136,0.15) !important;
+          }
+
+# Gráfico de Banda em Tempo Real (últimos 30 min)
+- type: custom:apexcharts-card
+  header:
+    show: true
+    title: "📶 Banda em Tempo Real — Últimos 30 minutos"
+    show_states: true
+    colorize_states: true
+  update_interval: 30000
+  graph_span: 30m
+  apex_config:
+    chart:
+      type: area
+      height: 220
+      background: transparent
+      toolbar: { show: false }
+      animations:
+        enabled: true
+        speed: 500
+        dynamicAnimation: { enabled: true, speed: 500 }
+    theme: { mode: dark }
+    colors: ["#00ff88", "#7b2fff"]
+    fill:
+      type: gradient
+      gradient:
+        shade: dark
+        type: vertical
+        opacityFrom: 0.5
+        opacityTo: 0.05
+    stroke: { curve: smooth, width: 2 }
+    grid: { borderColor: "rgba(26,39,68,0.8)", strokeDashArray: 4 }
+    xaxis:
+      type: datetime
+      labels: { format: "HH:mm", style: { colors: "#8892b0" } }
+    yaxis:
+      labels:
+        formatter: "function(v){return v.toFixed(0)+' Mbps'}"
+        style: { colors: "#8892b0" }
+    tooltip: { theme: dark, x: { format: "HH:mm:ss" } }
+    legend: { labels: { colors: "#8892b0" } }
+  series:
+    - entity: sensor.huawei_download_speed
+      name: "⬇️ Download"
+      color: "#00ff88"
+      type: area
+      extend_to: now
+    - entity: sensor.huawei_upload_speed
+      name: "⬆️ Upload"
+      color: "#7b2fff"
+      type: area
+      extend_to: now
+  card_mod:
+    style: |
+      ha-card {
+        background: linear-gradient(135deg, #0d1321 0%, #111827 100%) !important;
+        border: 1px solid #1a2744 !important;
+      }
+
+# Top 5 por consumo de banda + Status dos nós mesh
+- type: horizontal-stack
+  cards:
+
+    # Top 5 dispositivos por banda
+    - type: entities
+      title: "🏆 Top 5 — Consumo de Banda"
+      icon: mdi:podium
+      entities:
+        - entity: sensor.huawei_top1_device
+          name: "🥇 Dispositivo 1"
+          icon: mdi:laptop
+          secondary_info: attribute
+          attribute: bandwidth
+        - entity: sensor.huawei_top2_device
+          name: "🥈 Dispositivo 2"
+          icon: mdi:cellphone
+          secondary_info: attribute
+          attribute: bandwidth
+        - entity: sensor.huawei_top3_device
+          name: "🥉 Dispositivo 3"
+          icon: mdi:television
+          secondary_info: attribute
+          attribute: bandwidth
+        - entity: sensor.huawei_top4_device
+          name: "4️⃣ Dispositivo 4"
+          icon: mdi:tablet
+          secondary_info: attribute
+          attribute: bandwidth
+        - entity: sensor.huawei_top5_device
+          name: "5️⃣ Dispositivo 5"
+          icon: mdi:devices
+          secondary_info: attribute
+          attribute: bandwidth
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, #0d1321 0%, #111827 100%) !important;
+            border: 1px solid #1a2744 !important;
+          }
+
+    # Status dos nós mesh
+    - type: entities
+      title: "📡 Nós Mesh — Status"
+      icon: mdi:router-wireless-settings
+      entities:
+        - entity: binary_sensor.huawei_node_principal
+          name: "🟢 Nó Principal (Gateway)"
+          icon: mdi:router-wireless
+          secondary_info: last-changed
+        - entity: binary_sensor.huawei_node_satelite_1
+          name: "📶 Satélite 1"
+          icon: mdi:router-wireless
+          secondary_info: last-changed
+        - entity: binary_sensor.huawei_node_satelite_2
+          name: "📶 Satélite 2"
+          icon: mdi:router-wireless
+          secondary_info: last-changed
+        - type: attribute
+          entity: sensor.huawei_node_principal_info
+          name: "Sinal Principal"
+          attribute: signal_strength
+          icon: mdi:signal
+        - type: attribute
+          entity: sensor.huawei_node_satelite_1_info
+          name: "Sinal Satélite 1"
+          attribute: signal_strength
+          icon: mdi:signal
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, #0d1321 0%, #111827 100%) !important;
+            border: 1px solid #1a2744 !important;
+          }

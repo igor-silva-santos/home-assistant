@@ -1,0 +1,368 @@
+# ══════════════════════════════════════════════════════════════
+#  VIEW: HOME — Visão Geral
+#  Layout: Grid modular, tablet-first
+# ══════════════════════════════════════════════════════════════
+
+# ══════════════════════════════════════════════════════════════
+#  🔔 ALERTA DE CAMPAINHA — Aparece somente quando tocada
+#  Condicional: visível apenas quando input_boolean.alerta_campainha = on
+# ══════════════════════════════════════════════════════════════
+- type: conditional
+  conditions:
+    - entity: input_boolean.alerta_campainha
+      state: "on"
+  card:
+    type: custom:mushroom-template-card
+    primary: "🔔 CAMPAINHA"
+    secondary: "Alguém está na porteira! Toque para ver a câmera ou abrir a porteira."
+    icon: mdi:doorbell
+    icon_color: red
+    badge_icon: mdi:alert
+    badge_color: red
+    tap_action:
+      action: navigate
+      navigation_path: /lovelace/seguranca
+    card_mod:
+      style: |
+        ha-card {
+          background: linear-gradient(135deg, rgba(255,51,102,0.25) 0%, rgba(255,51,102,0.08) 100%) !important;
+          border: 2px solid rgba(255,51,102,0.8) !important;
+          animation: pulse-doorbell 1.2s ease-in-out infinite !important;
+          margin-bottom: 8px !important;
+        }
+        @keyframes pulse-doorbell {
+          0%   { box-shadow: 0 0 0 0 rgba(255,51,102,0.8), 0 0 30px rgba(255,51,102,0.4); }
+          40%  { box-shadow: 0 0 0 18px rgba(255,51,102,0), 0 0 50px rgba(255,51,102,0.7); }
+          100% { box-shadow: 0 0 0 0 rgba(255,51,102,0), 0 0 30px rgba(255,51,102,0.4); }
+        }
+        .primary {
+          font-size: 1.6rem !important;
+          font-weight: 900 !important;
+          color: #ff3366 !important;
+          letter-spacing: 0.12em !important;
+        }
+        .secondary { color: #e8eaf6 !important; font-size: 0.95rem !important; }
+        mushroom-shape-icon {
+          --icon-color: #ff3366 !important;
+          --shape-color: rgba(255,51,102,0.2) !important;
+          animation: bell-shake 0.6s ease-in-out infinite alternate !important;
+        }
+        @keyframes bell-shake {
+          0%   { transform: rotate(-15deg) scale(1.1); }
+          100% { transform: rotate(15deg) scale(1.2); }
+        }
+
+# Botões de ação para o alerta (aparecem junto com o card acima)
+- type: conditional
+  conditions:
+    - entity: input_boolean.alerta_campainha
+      state: "on"
+  card:
+    type: horizontal-stack
+    cards:
+      - type: button
+        name: "📹 Ver Câmera"
+        icon: mdi:cctv
+        tap_action:
+          action: navigate
+          navigation_path: /lovelace/seguranca
+        card_mod:
+          style: |
+            ha-card {
+              background: rgba(0,212,255,0.1) !important;
+              border: 1px solid rgba(0,212,255,0.5) !important;
+              animation: glow-cyan 2s ease-in-out infinite alternate;
+            }
+            @keyframes glow-cyan {
+              from { box-shadow: 0 0 8px rgba(0,212,255,0.3); }
+              to   { box-shadow: 0 0 24px rgba(0,212,255,0.8); }
+            }
+      - type: button
+        name: "🔓 Abrir Porteira"
+        icon: mdi:gate
+        tap_action:
+          action: call-service
+          service: lock.unlock
+          service_data:
+            entity_id: lock.porteira
+        card_mod:
+          style: |
+            ha-card {
+              background: rgba(255,51,102,0.12) !important;
+              border: 1px solid rgba(255,51,102,0.5) !important;
+            }
+            ha-card:active { background: rgba(255,51,102,0.3) !important; }
+      - type: button
+        name: "✖ Dispensar"
+        icon: mdi:bell-off
+        tap_action:
+          action: call-service
+          service: input_boolean.turn_off
+          service_data:
+            entity_id: input_boolean.alerta_campainha
+        card_mod:
+          style: |
+            ha-card {
+              background: rgba(61,74,107,0.3) !important;
+              border: 1px solid rgba(61,74,107,0.6) !important;
+            }
+
+# ── LINHA 1: Topo — Saudação + Clima + Status ─────────────────
+- type: horizontal-stack
+  cards:
+
+    # Saudação personalizada
+    - type: custom:mushroom-template-card
+      primary: "{{ states('sensor.saudacao') }}, Igor! 👋"
+      secondary: >
+        {{ now().strftime('%A, %d de %B') }} |
+        {{ now().strftime('%H:%M') }}
+      icon: mdi:hand-wave
+      icon_color: cyan
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(0,212,255,0.08) 0%, transparent 100%) !important;
+            border: 1px solid rgba(0,212,255,0.2) !important;
+            box-shadow: 0 0 20px rgba(0,212,255,0.08) !important;
+          }
+          .primary { font-size: 1.4rem !important; font-weight: 700; color: var(--ft-cyan, #00d4ff) !important; }
+          .secondary { font-size: 0.9rem !important; color: var(--secondary-text-color) !important; }
+
+    # Clima atual
+    - type: weather-forecast
+      entity: weather.home  # ← troque pelo seu weather entity
+      show_forecast: false
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(123,47,255,0.08) 0%, transparent 100%) !important;
+            border: 1px solid rgba(123,47,255,0.2) !important;
+          }
+          .weather-attributes { color: var(--secondary-text-color) !important; }
+
+    # Status rápido da casa
+    - type: custom:mushroom-template-card
+      primary: "{{ states('sensor.dispositivos_ligados') }} ligados"
+      secondary: "Alarme: {{ iif(is_state('input_boolean.alarme_ativo','on'),'✅ Ativo','❌ Inativo') }} | {{ states('input_select.modo_casa') }}"
+      icon: >
+        {% if is_state('input_boolean.alarme_ativo','on') %}mdi:shield-check{% else %}mdi:shield-off{% endif %}
+      icon_color: >
+        {% if is_state('input_boolean.alarme_ativo','on') %}green{% else %}red{% endif %}
+      tap_action:
+        action: navigate
+        navigation_path: /lovelace/config
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(0,255,136,0.06) 0%, transparent 100%) !important;
+            border: 1px solid rgba(0,255,136,0.15) !important;
+          }
+
+# ── LINHA 2: Módulos especiais ────────────────────────────────
+- type: horizontal-stack
+  cards:
+
+    # MÓDULO 1: ORBE — Lançamentos da semana
+    - type: custom:orbe-card
+      title: "🚀 Lançamentos da Semana"
+      api_url: "https://api.orbe.com/lancamentos"
+      api_key: !secret orbe_api_key
+      refresh_interval: 21600  # 6 horas em segundos
+      categorias:
+        - jogo
+        - serie
+        - filme
+        - anime
+      max_items: 10
+      card_mod:
+        style: |
+          ha-card {
+            min-height: 280px;
+          }
+
+    # MÓDULO 2: Lembretes & Tarefas
+    - type: custom:reminder-card
+      title: "📋 Lembretes & Tarefas"
+      storage_entity_tarefas: input_text.tarefas_json
+      storage_entity_lembretes: input_text.lembretes_json
+      storage_entity_compras: input_text.compras_json
+      notify_service: notify.alexa_media  # deixe vazio se não usar Alexa
+      alexa_entity: media_player.echo_sala  # ← seu dispositivo Alexa
+      shopping_list_integration: true
+      card_mod:
+        style: |
+          ha-card {
+            min-height: 280px;
+          }
+
+    # MÓDULO 3: Calendário 3 dias
+    - type: custom:calendar-card
+      title: "📅 Calendário"
+      calendar_entity: calendar.home  # ← sua entidade calendar
+      show_days: 3
+      refresh_interval: 300  # 5 minutos
+      card_mod:
+        style: |
+          ha-card {
+            min-height: 280px;
+          }
+
+# ── LINHA 3: Controles rápidos dos cômodos ───────────────────
+- type: custom:mushroom-title-card
+  title: "Cômodos"
+  subtitle: "Controle rápido por ambiente"
+
+- type: horizontal-stack
+  cards:
+
+    - type: custom:room-card
+      room: sala
+      name: "Sala"
+      icon: mdi:sofa
+      entities:
+        - entity: light.sala_principal
+          name: "Luz Principal"
+        - entity: light.sala_abajur
+          name: "Abajur"
+        - entity: switch.tv_sala
+          name: "TV"
+        - entity: sensor.temperatura_sala
+          name: "Temperatura"
+      navigate_to: /lovelace/comodos
+
+    - type: custom:room-card
+      room: quarto
+      name: "Quarto"
+      icon: mdi:bed-king
+      entities:
+        - entity: light.quarto_principal
+          name: "Luz"
+        - entity: switch.ar_condicionado_quarto
+          name: "Ar Condicionado"
+        - entity: sensor.temperatura_quarto
+          name: "Temperatura"
+      navigate_to: /lovelace/comodos
+
+    - type: custom:room-card
+      room: cozinha
+      name: "Cozinha"
+      icon: mdi:chef-hat
+      entities:
+        - entity: light.cozinha
+          name: "Luz"
+        - entity: switch.geladeira
+          name: "Geladeira"
+        - entity: sensor.temperatura_cozinha
+          name: "Temperatura"
+      navigate_to: /lovelace/comodos
+
+    - type: custom:room-card
+      room: banheiro
+      name: "Banheiro"
+      icon: mdi:shower
+      entities:
+        - entity: light.banheiro
+          name: "Luz"
+        - entity: binary_sensor.movimento_banheiro
+          name: "Movimento"
+      navigate_to: /lovelace/comodos
+
+    - type: custom:room-card
+      room: escritorio
+      name: "Escritório"
+      icon: mdi:desk
+      entities:
+        - entity: light.escritorio
+          name: "Luz"
+        - entity: switch.computador
+          name: "Computador"
+        - entity: sensor.temperatura_escritorio
+          name: "Temperatura"
+      navigate_to: /lovelace/comodos
+
+    - type: custom:room-card
+      room: area_externa
+      name: "Área Externa"
+      icon: mdi:tree
+      entities:
+        - entity: light.area_externa
+          name: "Luz"
+        - entity: binary_sensor.movimento_externo
+          name: "Movimento"
+        - entity: sensor.temperatura_externa
+          name: "Temperatura"
+      navigate_to: /lovelace/comodos
+
+# ── LINHA 4: Consumo resumido ─────────────────────────────────
+- type: custom:mushroom-title-card
+  title: "⚡ Energia"
+  subtitle: "Resumo do consumo atual"
+
+- type: horizontal-stack
+  cards:
+
+    # Mini sparkline consumo do dia
+    - type: custom:mini-graph-card
+      name: "Consumo Hoje"
+      icon: mdi:flash
+      entities:
+        - entity: sensor.consumo_diario_kwh
+          name: "kWh"
+      hours_to_show: 24
+      points_per_hour: 2
+      line_color: "#00d4ff"
+      line_width: 2
+      font_size: 75
+      show:
+        graph: line
+        icon: true
+        state: true
+        name: true
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(0,212,255,0.06) 0%, transparent 100%) !important;
+          }
+
+    # Top 3 consumidores
+    - type: entities
+      title: "🔌 Top Consumidores"
+      entities:
+        - entity: sensor.consumo_dispositivo_1
+          name: "🥇 Ar Condicionado"
+          secondary_info: last-changed
+        - entity: sensor.consumo_dispositivo_2
+          name: "🥈 Geladeira"
+          secondary_info: last-changed
+        - entity: sensor.consumo_dispositivo_3
+          name: "🥉 TV Sala"
+          secondary_info: last-changed
+      card_mod:
+        style: |
+          ha-card {
+            background: var(--ft-bg-card, #0d1321) !important;
+          }
+
+    # Custo mensal estimado
+    - type: custom:mushroom-template-card
+      primary: "R$ {{ states('sensor.custo_mes_estimado') }}"
+      secondary: "Estimativa mensal | {{ states('sensor.consumo_mes_kwh') | round(1) }} kWh"
+      icon: mdi:currency-brl
+      icon_color: gold
+      badge_icon: >
+        {% set kwh = states('sensor.consumo_mes_kwh') | float(0) %}
+        {% if kwh > 200 %}mdi:alert{% elif kwh > 150 %}mdi:alert-circle-outline{% else %}mdi:check-circle{% endif %}
+      badge_color: >
+        {% set kwh = states('sensor.consumo_mes_kwh') | float(0) %}
+        {% if kwh > 200 %}red{% elif kwh > 150 %}orange{% else %}green{% endif %}
+      tap_action:
+        action: navigate
+        navigation_path: /lovelace/energia
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(255,215,0,0.06) 0%, transparent 100%) !important;
+            border: 1px solid rgba(255,215,0,0.15) !important;
+          }
+          .primary { font-size: 1.8rem !important; font-weight: 700; color: #ffd700 !important; }

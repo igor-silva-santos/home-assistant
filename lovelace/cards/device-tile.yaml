@@ -1,0 +1,60 @@
+# ══════════════════════════════════════════════════════════════
+#  CARD: DEVICE TILE — Card padrão de dispositivo reutilizável
+#  Uso: inclua com !include e passe variáveis via card_mod
+# ══════════════════════════════════════════════════════════════
+#
+# Exemplo de uso:
+#   - type: custom:mushroom-entity-card
+#     entity: light.sala_principal
+#     name: "Luz Principal"
+#     icon: mdi:ceiling-light
+#     tap_action:
+#       action: toggle
+#     card_mod: !include lovelace/cards/device-tile.yaml
+#
+
+style: |
+  ha-card {
+    background: linear-gradient(135deg,
+      {{ 'rgba(0,212,255,0.08)' if is_state(config.entity, 'on') else '#0d1321' }} 0%,
+      {{ 'rgba(0,212,255,0.02)' if is_state(config.entity, 'on') else '#111827' }} 100%
+    ) !important;
+    border: 1px solid
+      {{ 'rgba(0,212,255,0.35)' if is_state(config.entity, 'on') else '#1a2744' }}
+    !important;
+    border-radius: 14px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow:
+      {{ '0 0 16px rgba(0,212,255,0.15), 0 4px 16px rgba(0,0,0,0.3)' if is_state(config.entity, 'on') else '0 4px 12px rgba(0,0,0,0.2)' }}
+    !important;
+  }
+  ha-card:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      {{ '0 0 24px rgba(0,212,255,0.25), 0 8px 24px rgba(0,0,0,0.4)' if is_state(config.entity, 'on') else '0 8px 24px rgba(0,0,0,0.35)' }}
+    !important;
+  }
+  mushroom-shape-icon {
+    --icon-color:
+      {{ '#00d4ff' if is_state(config.entity, 'on') else '#3d4a6b' }}
+    !important;
+    --shape-color:
+      {{ 'rgba(0,212,255,0.15)' if is_state(config.entity, 'on') else 'rgba(26,39,68,0.4)' }}
+    !important;
+    {{ 'filter: drop-shadow(0 0 6px rgba(0,212,255,0.6));' if is_state(config.entity, 'on') else '' }}
+    transition: all 0.3s !important;
+  }
+  .primary {
+    color:
+      {{ '#e8eaf6' if is_state(config.entity, 'on') else '#8892b0' }}
+    !important;
+    font-weight: 600 !important;
+    transition: color 0.3s !important;
+  }
+  .secondary {
+    color:
+      {{ '#00d4ff' if is_state(config.entity, 'on') else '#3d4a6b' }}
+    !important;
+    font-size: 0.75rem !important;
+    transition: color 0.3s !important;
+  }

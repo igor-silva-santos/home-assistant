@@ -1,0 +1,132 @@
+# ══════════════════════════════════════════════════════════════
+#  CARD: ENERGY CHART — Gráfico de consumo reutilizável
+#  Uso: custom:apexcharts-card pré-configurado com tema futurista
+# ══════════════════════════════════════════════════════════════
+#
+# Exemplo de uso:
+#   - type: custom:apexcharts-card
+#     <<: !include lovelace/cards/energy-chart.yaml
+#     header:
+#       title: "Meu Título"
+#     series:
+#       - entity: sensor.meu_sensor
+#         name: "Dado"
+#
+
+graph_span: 24h
+update_interval: 60000
+
+header:
+  show: true
+  show_states: true
+  colorize_states: true
+
+apex_config:
+  chart:
+    type: area
+    height: 200
+    background: transparent
+    toolbar:
+      show: false
+    sparkline:
+      enabled: false
+    animations:
+      enabled: true
+      easing: easeinout
+      speed: 800
+      animateGradually:
+        enabled: true
+        delay: 100
+      dynamicAnimation:
+        enabled: true
+        speed: 350
+
+  theme:
+    mode: dark
+
+  colors:
+    - "#00d4ff"
+    - "#7b2fff"
+    - "#00ff88"
+    - "#ffd700"
+    - "#ff3366"
+
+  fill:
+    type: gradient
+    gradient:
+      shade: dark
+      type: vertical
+      shadeIntensity: 0.5
+      gradientToColors:
+        - "#7b2fff"
+      opacityFrom: 0.7
+      opacityTo: 0.05
+      stops: [0, 100]
+
+  stroke:
+    curve: smooth
+    width: 2
+
+  grid:
+    show: true
+    borderColor: "rgba(26,39,68,0.8)"
+    strokeDashArray: 4
+    position: back
+    xaxis:
+      lines:
+        show: false
+    yaxis:
+      lines:
+        show: true
+
+  xaxis:
+    type: datetime
+    labels:
+      datetimeFormatter:
+        hour: "HH:mm"
+        day: "dd/MM"
+      style:
+        colors: "#8892b0"
+        fontSize: "11px"
+    axisBorder:
+      show: false
+    axisTicks:
+      show: false
+
+  yaxis:
+    labels:
+      style:
+        colors: "#8892b0"
+        fontSize: "11px"
+    axisBorder:
+      show: false
+
+  tooltip:
+    theme: dark
+    x:
+      format: "dd/MM HH:mm"
+
+  legend:
+    show: true
+    labels:
+      colors: "#8892b0"
+    markers:
+      width: 8
+      height: 8
+      radius: 4
+
+  dataLabels:
+    enabled: false
+
+  markers:
+    size: 0
+    hover:
+      size: 4
+
+card_mod:
+  style: |
+    ha-card {
+      background: linear-gradient(135deg, #0d1321 0%, #111827 100%) !important;
+      border: 1px solid #1a2744 !important;
+      border-radius: 16px !important;
+    }

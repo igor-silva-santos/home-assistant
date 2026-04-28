@@ -1,0 +1,318 @@
+# ══════════════════════════════════════════════════════════════
+#  automations.yaml — Automações Home Assistant
+#  Dashboard Futurista  |  Versão 2.0
+# ══════════════════════════════════════════════════════════════
+
+# ── 1. MODO NOTURNO (23:00) ───────────────────────────────────
+- id: modo_noturno
+  alias: "Modo Noturno"
+  description: "23:00 → dimmer luzes, silêncio, modo escuro"
+  trigger:
+    - platform: time
+      at: "23:00:00"
+  condition:
+    - condition: state
+      entity_id: input_boolean.modo_noturno
+      state: "off"  # só ativa se não estiver ativo
+  action:
+    - service: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.modo_noturno
+    - service: input_select.select_option
+      target:
+        entity_id: input_select.modo_casa
+      data:
+        option: Noturno
+    # Dimmer todas as luzes para 30%
+    - service: light.turn_on
+      target:
+        entity_id: all
+      data:
+        brightness_pct: 30
+        transition: 60  # 1 minuto de transição suave
+    # Notifica dispositivos móveis
+    - service: notify.mobile_app_meu_celular  # ← troque pelo seu app
+      data:
+        title: "🌙 Modo Noturno Ativado"
+        message: "Luzes reduzidas. Boa noite!"
+    # Alexa anuncia
+    - service: notify.alexa_media
+      data:
+        target: media_player.echo_sala  # ← troque pelo seu Echo
+        message: "Modo noturno ativado. Boa noite!"
+        data:
+          type: announce
+  mode: single
+
+# ── 2. MODO MANHÃ (07:00) ─────────────────────────────────────
+- id: modo_manha
+  alias: "Modo Manhã"
+  description: "07:00 → luzes gradual, clima, notícia do dia"
+  trigger:
+    - platform: time
+      at: "07:00:00"
+  condition:
+    - condition: time
+      weekday:
+        - mon
+        - tue
+        - wed
+        - thu
+        - fri
+  action:
+    - service: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.modo_noturno
+    - service: input_select.select_option
+      target:
+        entity_id: input_select.modo_casa
+      data:
+        option: Manhã
+    # Luzes gradualmente até 100%
+    - service: light.turn_on
+      target:
+        entity_id:
+          - light.quarto_principal
+          - light.banheiro
+      data:
+        brightness_pct: 100
+        transition: 120  # 2 minutos
+        color_temp: 4000
+    # Alexa fala bom dia
+    - delay: "00:02:00"
+    - service: notify.alexa_media
+      data:
+        target: media_player.echo_quarto
+        message: >
+          Bom dia! São 7 horas da manhã.
+          A temperatura externa está {{ states('sensor.temperatura_externa') }} graus.
+          Tenha um ótimo dia!
+        data:
+          type: announce
+    # Notifica celular
+    - service: notify.mobile_app_meu_celular
+      data:
+        title: "☀️ Bom Dia!"
+        message: "{{ states('sensor.saudacao') }}! Temperatura: {{ states('sensor.temperatura_externa') }}°C"
+        data:
+          image: /local/images/morning.jpg
+  mode: single
+
+# ── 3. DESLIGAR LUZES SEM MOVIMENTO ──────────────────────────
+- id: desligar_luzes_sem_movimento
+  alias: "Desligar Luzes — Sem Movimento"
+  description: "30 min sem movimento → apaga luzes do cômodo"
+  trigger:
+    - platform: state
+      entity_id:
+        - binary_sensor.movimento_sala
+        - binary_sensor.movimento_cozinha
+        - binary_sensor.movimento_banheiro
+        - binary_sensor.movimento_escritorio
+      to: "off"
+      for:
+        minutes: 30
+  action:
+    - variables:
+        room_map:
+          binary_sensor.movimento_sala: light.sala_principal
+          binary_sensor.movimento_cozinha: light.cozinha
+          binary_sensor.movimento_banheiro: light.banheiro
+          binary_sensor.movimento_escritorio: light.escritorio
+    - service: light.turn_off
+      target:
+        entity_id: "{{ room_map[trigger.entity_id] }}"
+      data:
+        transition: 10
+  mode: parallel
+  max: 4
+
+# ── 4. ALERTA DE CONSUMO ANÔMALO ─────────────────────────────
+- id: alerta_consumo_anomalo
+  alias: "Alerta Consumo Alto"
+  description: "Notifica quando consumo > 20% acima da média"
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.consumo_diario_kwh
+      above: "{{ (states('sensor.consumo_medio_diario_kwh') | float(5) * 1.20) }}"
+      for:
+        minutes: 15
+  condition:
+    - condition: time
+      after: "08:00:00"
+      before: "22:00:00"
+  action:
+    - service: notify.mobile_app_meu_celular
+      data:
+        title: "⚡ Consumo Alto!"
+        message: >
+          Consumo de hoje ({{ states('sensor.consumo_diario_kwh') | round(2) }} kWh)
+          está 20% acima da média ({{ states('sensor.consumo_medio_diario_kwh') | round(2) }} kWh).
+          Verifique quais dispositivos estão ligados.
+        data:
+          actions:
+            - action: "VIEW_ENERGY"
+              title: "Ver Energia"
+    - service: notify.alexa_media
+      data:
+        target: media_player.echo_sala
+        message: "Atenção! O consumo de energia está acima do normal hoje."
+        data:
+          type: announce
+  mode: single
+  max_exceeded: silent
+
+# ── 5. SYNC LISTA DE COMPRAS → ALEXA ─────────────────────────
+- id: sync_lista_compras_alexa
+  alias: "Sync Lista de Compras → Alexa"
+  description: "Sincroniza shopping_list com lista da Alexa a cada hora"
+  trigger:
+    - platform: time_pattern
+      hours: "/1"  # a cada hora
+    - platform: event
+      event_type: shopping_list_updated
+  action:
+    - service: notify.alexa_media
+      data:
+        target: media_player.echo_sala
+        message: "Lista de compras atualizada."
+        data:
+          type: tts
+    # A integração alexa_media pode sincronizar listas via API
+    # Verifique a documentação: https://github.com/custom-components/alexa_media_player
+  mode: single
+
+# ── 6. NOTIFICAÇÃO DE LEMBRETE ────────────────────────────────
+- id: notificacao_lembrete
+  alias: "Notificação de Lembrete"
+  description: "Dispara ao marcar input_boolean de lembrete"
+  trigger:
+    - platform: state
+      entity_id: input_boolean.modo_noturno  # placeholder — o reminder-card.js cria os timers
+  condition: []
+  action:
+    - service: notify.mobile_app_meu_celular
+      data:
+        title: "⏰ Lembrete"
+        message: "Você tem um lembrete pendente!"
+    - service: notify.alexa_media
+      data:
+        target: media_player.echo_sala
+        message: "Você tem um lembrete. Verifique o dashboard."
+        data:
+          type: announce
+  mode: single
+
+# ══════════════════════════════════════════════════════════════
+#  🔔 CAMPAINHA ELETRÔNICA
+# ══════════════════════════════════════════════════════════════
+
+# ── 7. ALERTA DE CAMPAINHA — Ativar ──────────────────────────
+- id: alerta_campainha_ativar
+  alias: "Campainha — Detectar e Alertar"
+  description: >
+    Quando binary_sensor.campainha disparar:
+    1. Notifica mobile_app com imagem da câmera
+    2. Alexa anuncia "Alguém na porteira"
+    3. Ativa input_boolean.alerta_campainha por 30s
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.campainha  # ← placeholder: sensor da campainha
+      to: "on"
+  condition: []
+  action:
+    # Ativa o boolean de alerta (aparece o card pulsante no Home)
+    - service: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.alerta_campainha
+
+    # Notifica todos os apps mobile registrados
+    - service: notify.notify  # "notify.notify" envia para TODOS os apps mobile registrados
+      data:
+        title: "🔔 Campainha!"
+        message: "Alguém está na porteira. Toque para ver a câmera."
+        data:
+          # Imagem da câmera de entrada (requer HA Companion App)
+          image: /api/camera_proxy/camera.camera_01
+          # Ações rápidas no push
+          actions:
+            - action: "OPEN_GATE"
+              title: "🔓 Abrir Porteira"
+            - action: "VIEW_CAMERA"
+              title: "📹 Ver Câmera"
+          # Android: canal de notificação para toque sonoro
+          channel: "campainha"
+          importance: high
+          # iOS: som
+          push:
+            sound: default
+            interruption-level: time-sensitive
+
+    # Alexa anuncia em todos os dispositivos Echo
+    - service: notify.alexa_media
+      data:
+        target:
+          - media_player.echo_sala        # ← substitua pelos seus Echos
+          - media_player.echo_quarto
+        message: "Alguém está na porteira!"
+        data:
+          type: announce
+          method: all
+
+    # Desativa o alerta automaticamente após 30 segundos
+    - delay: "00:00:30"
+    - service: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.alerta_campainha
+  mode: single
+
+# ── 8. AÇÃO DE ABRIR PORTEIRA VIA PUSH NOTIFICATION ──────────
+- id: acao_abrir_porteira_push
+  alias: "Ação Push — Abrir Porteira"
+  description: "Responde ao botão 'Abrir Porteira' na notificação push"
+  trigger:
+    - platform: event
+      event_type: mobile_app_notification_action
+      event_data:
+        action: OPEN_GATE
+  action:
+    - service: lock.unlock
+      target:
+        entity_id: lock.porteira
+    - service: notify.notify
+      data:
+        title: "✅ Porteira Aberta"
+        message: "A porteira foi aberta remotamente."
+  mode: single
+
+# ── 9. MODO AUSENTE — Segurança ──────────────────────────────
+- id: modo_ausente_seguranca
+  alias: "Modo Ausente — Ativar Segurança"
+  description: "Ao selecionar Ausente: desliga tudo, ativa alarme"
+  trigger:
+    - platform: state
+      entity_id: input_select.modo_casa
+      to: Ausente
+  action:
+    # Desliga todas as luzes
+    - service: light.turn_off
+      target:
+        entity_id: all
+    # Desliga todos os switches não essenciais
+    - service: switch.turn_off
+      target:
+        entity_id:
+          - switch.tv_sala
+          - switch.som_sala
+          - switch.computador
+          - switch.monitor_extra
+    # Ativa alarme
+    - service: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.alarme_ativo
+    # Notifica
+    - service: notify.mobile_app_meu_celular
+      data:
+        title: "🏠 Modo Ausente Ativado"
+        message: "Casa protegida. Alarme ativo. Todos os dispositivos desligados."
+  mode: single

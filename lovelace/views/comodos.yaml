@@ -1,0 +1,250 @@
+# ══════════════════════════════════════════════════════════════
+#  VIEW: CÔMODOS — Controle por Ambiente
+# ══════════════════════════════════════════════════════════════
+
+- type: custom:mushroom-title-card
+  title: "🏢 Cômodos"
+  subtitle: "Controle completo de cada ambiente"
+  card_mod:
+    style: |
+      ha-card { background: transparent !important; border: none !important; }
+
+# ── Sala ─────────────────────────────────────────────────────
+- type: custom:room-card
+  room: sala
+  name: "Sala de Estar"
+  icon: mdi:sofa-single
+  show_header: true
+  layout: grid
+  entities:
+    - entity: light.sala_principal
+      name: "Luz Principal"
+      icon: mdi:ceiling-light
+      show_brightness: true
+    - entity: light.sala_abajur
+      name: "Abajur"
+      icon: mdi:floor-lamp
+      show_brightness: true
+    - entity: switch.tv_sala
+      name: "TV 65\""
+      icon: mdi:television
+      show_power: true
+    - entity: switch.som_sala
+      name: "Sistema de Som"
+      icon: mdi:speaker
+    - entity: sensor.temperatura_sala
+      name: "Temperatura"
+      icon: mdi:thermometer
+      type: sensor
+    - entity: binary_sensor.movimento_sala
+      name: "Movimento"
+      icon: mdi:motion-sensor
+      type: sensor
+
+# ── Quarto ───────────────────────────────────────────────────
+- type: custom:room-card
+  room: quarto
+  name: "Quarto Principal"
+  icon: mdi:bed-king-outline
+  show_header: true
+  layout: grid
+  entities:
+    - entity: light.quarto_principal
+      name: "Luz Principal"
+      icon: mdi:ceiling-light
+      show_brightness: true
+    - entity: light.quarto_bedside
+      name: "Cabeceira"
+      icon: mdi:lamp
+      show_brightness: true
+    - entity: switch.ar_condicionado_quarto
+      name: "Ar Condicionado"
+      icon: mdi:air-conditioner
+      show_power: true
+    - entity: sensor.temperatura_quarto
+      name: "Temperatura"
+      icon: mdi:thermometer
+      type: sensor
+    - entity: sensor.umidade_quarto
+      name: "Umidade"
+      icon: mdi:water-percent
+      type: sensor
+    - entity: binary_sensor.movimento_quarto
+      name: "Movimento"
+      icon: mdi:motion-sensor
+      type: sensor
+
+# ── Cozinha ──────────────────────────────────────────────────
+- type: custom:room-card
+  room: cozinha
+  name: "Cozinha"
+  icon: mdi:chef-hat
+  show_header: true
+  layout: grid
+  entities:
+    - entity: light.cozinha
+      name: "Luz Cozinha"
+      icon: mdi:ceiling-light
+      show_brightness: true
+    - entity: switch.geladeira
+      name: "Geladeira"
+      icon: mdi:fridge
+      show_power: true
+    - entity: switch.microondas
+      name: "Micro-ondas"
+      icon: mdi:microwave
+      show_power: true
+    - entity: switch.lava_loucas
+      name: "Lava-louças"
+      icon: mdi:dishwasher
+    - entity: sensor.temperatura_cozinha
+      name: "Temperatura"
+      icon: mdi:thermometer
+      type: sensor
+    - entity: binary_sensor.fumaca_cozinha
+      name: "Detector de Fumaça"
+      icon: mdi:smoke-detector
+      type: sensor
+
+# ── Banheiro ──────────────────────────────────────────────────
+- type: custom:room-card
+  room: banheiro
+  name: "Banheiro"
+  icon: mdi:shower-head
+  show_header: true
+  layout: grid
+  entities:
+    - entity: light.banheiro
+      name: "Luz Banheiro"
+      icon: mdi:ceiling-light
+      show_brightness: true
+    - entity: switch.aquecedor_banheiro
+      name: "Aquecedor"
+      icon: mdi:radiator
+      show_power: true
+    - entity: sensor.temperatura_banheiro
+      name: "Temperatura"
+      icon: mdi:thermometer
+      type: sensor
+    - entity: sensor.umidade_banheiro
+      name: "Umidade"
+      icon: mdi:water-percent
+      type: sensor
+    - entity: binary_sensor.movimento_banheiro
+      name: "Movimento"
+      icon: mdi:motion-sensor
+      type: sensor
+
+# ── Escritório ────────────────────────────────────────────────
+- type: custom:room-card
+  room: escritorio
+  name: "Escritório"
+  icon: mdi:desk-lamp
+  show_header: true
+  layout: grid
+  entities:
+    - entity: light.escritorio
+      name: "Luz Escritório"
+      icon: mdi:ceiling-light
+      show_brightness: true
+    - entity: light.escritorio_mesa
+      name: "Luz de Mesa"
+      icon: mdi:desk-lamp
+      show_brightness: true
+    - entity: switch.computador
+      name: "Computador"
+      icon: mdi:desktop-tower
+      show_power: true
+    - entity: switch.monitor_extra
+      name: "Monitor Extra"
+      icon: mdi:monitor
+      show_power: true
+    - entity: sensor.temperatura_escritorio
+      name: "Temperatura"
+      icon: mdi:thermometer
+      type: sensor
+    - entity: sensor.co2_escritorio
+      name: "CO₂"
+      icon: mdi:molecule-co2
+      type: sensor
+
+# ── Área Externa ──────────────────────────────────────────────
+- type: custom:room-card
+  room: area_externa
+  name: "Área Externa"
+  icon: mdi:tree-outline
+  show_header: true
+  layout: grid
+  entities:
+    - entity: light.area_externa
+      name: "Luz Área"
+      icon: mdi:outdoor-lamp
+      show_brightness: true
+    - entity: light.portao_luz
+      name: "Luz do Portão"
+      icon: mdi:gate
+    - entity: switch.irrigacao
+      name: "Irrigação"
+      icon: mdi:sprinkler-variant
+    - entity: binary_sensor.movimento_externo
+      name: "Movimento Externo"
+      icon: mdi:motion-sensor
+      type: sensor
+    - entity: sensor.temperatura_externa
+      name: "Temperatura"
+      icon: mdi:thermometer
+      type: sensor
+    - entity: sensor.chuva
+      name: "Chuva"
+      icon: mdi:weather-rainy
+      type: sensor
+
+# ── Controles Master ──────────────────────────────────────────
+- type: custom:mushroom-title-card
+  title: "⚡ Controles Gerais"
+  subtitle: "Liga/desliga todos os dispositivos de uma área"
+
+- type: horizontal-stack
+  cards:
+    - type: custom:mushroom-template-card
+      primary: "Todas as Luzes OFF"
+      icon: mdi:lightbulb-group-off
+      icon_color: red
+      tap_action:
+        action: call-service
+        service: light.turn_off
+        service_data:
+          entity_id: all
+      card_mod:
+        style: |
+          ha-card { cursor: pointer; }
+          ha-card:hover { box-shadow: 0 0 20px rgba(255,51,102,0.4) !important; }
+
+    - type: custom:mushroom-template-card
+      primary: "Todas as Luzes ON"
+      icon: mdi:lightbulb-group
+      icon_color: yellow
+      tap_action:
+        action: call-service
+        service: light.turn_on
+        service_data:
+          entity_id: all
+      card_mod:
+        style: |
+          ha-card { cursor: pointer; }
+          ha-card:hover { box-shadow: 0 0 20px rgba(255,215,0,0.4) !important; }
+
+    - type: custom:mushroom-template-card
+      primary: "Modo Ausente"
+      secondary: "Desliga tudo e ativa alarme"
+      icon: mdi:home-export-outline
+      icon_color: purple
+      tap_action:
+        action: call-service
+        service: input_select.select_option
+        service_data:
+          entity_id: input_select.modo_casa
+          option: Ausente
+      card_mod:
+        style: |
+          ha-card { cursor: pointer; }

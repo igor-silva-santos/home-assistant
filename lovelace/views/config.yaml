@@ -1,0 +1,163 @@
+# ══════════════════════════════════════════════════════════════
+#  VIEW: CONFIG — Configurações do Dashboard
+# ══════════════════════════════════════════════════════════════
+
+- type: custom:mushroom-title-card
+  title: "⚙️ Configurações"
+  subtitle: "Personalize seu dashboard e integrações"
+  card_mod:
+    style: |
+      ha-card { background: transparent !important; border: none !important; }
+
+# ── Modo da Casa ──────────────────────────────────────────────
+- type: custom:mushroom-title-card
+  title: "🏠 Modo da Casa"
+
+- type: horizontal-stack
+  cards:
+    - type: custom:mushroom-select-card
+      entity: input_select.modo_casa
+      name: "Modo Atual"
+      icon: mdi:home-circle
+      icon_color: cyan
+
+    - type: custom:mushroom-entity-card
+      entity: input_boolean.alarme_ativo
+      name: "Alarme"
+      icon: mdi:alarm
+      tap_action:
+        action: toggle
+
+    - type: custom:mushroom-entity-card
+      entity: input_boolean.modo_noturno
+      name: "Modo Noturno"
+      icon: mdi:weather-night
+      tap_action:
+        action: toggle
+
+# ── Tema ──────────────────────────────────────────────────────
+- type: custom:mushroom-title-card
+  title: "🎨 Aparência"
+
+- type: entity
+  entity: frontend.theme
+  name: "Tema Ativo"
+  card_mod:
+    style: |
+      ha-card {
+        background: linear-gradient(135deg, #0d1321 0%, #111827 100%) !important;
+        border: 1px solid #1a2744 !important;
+      }
+
+- type: horizontal-stack
+  cards:
+    - type: button
+      name: "Futuristic Dark"
+      icon: mdi:weather-night
+      tap_action:
+        action: call-service
+        service: frontend.set_theme
+        service_data:
+          name: futuristic_dark
+          mode: dark
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(0,212,255,0.1) 0%, transparent 100%) !important;
+            border: 1px solid rgba(0,212,255,0.3) !important;
+          }
+
+    - type: button
+      name: "Tema Padrão"
+      icon: mdi:theme-light-dark
+      tap_action:
+        action: call-service
+        service: frontend.set_theme
+        service_data:
+          name: default
+      card_mod:
+        style: |
+          ha-card { border: 1px solid #1a2744 !important; }
+
+# ── Energia ───────────────────────────────────────────────────
+- type: custom:mushroom-title-card
+  title: "⚡ Configurações de Energia"
+
+- type: entity
+  entity: input_number.tarifa_kwh
+  name: "Tarifa R$/kWh"
+  card_mod:
+    style: |
+      ha-card {
+        background: linear-gradient(135deg, #0d1321 0%, #111827 100%) !important;
+        border: 1px solid #1a2744 !important;
+      }
+
+# ── Sistema ───────────────────────────────────────────────────
+- type: custom:mushroom-title-card
+  title: "🖥️ Sistema"
+
+- type: horizontal-stack
+  cards:
+    - type: custom:mushroom-template-card
+      primary: "{{ states('sensor.processor_use') }}%"
+      secondary: "CPU"
+      icon: mdi:cpu-64-bit
+      icon_color: >
+        {% set cpu = states('sensor.processor_use') | float(0) %}
+        {% if cpu > 80 %}red{% elif cpu > 60 %}orange{% else %}green{% endif %}
+    - type: custom:mushroom-template-card
+      primary: "{{ states('sensor.memory_use_percent') }}%"
+      secondary: "RAM"
+      icon: mdi:memory
+      icon_color: >
+        {% set ram = states('sensor.memory_use_percent') | float(0) %}
+        {% if ram > 85 %}red{% elif ram > 70 %}orange{% else %}green{% endif %}
+    - type: custom:mushroom-template-card
+      primary: "{{ states('sensor.disk_use_percent') }}%"
+      secondary: "Disco"
+      icon: mdi:harddisk
+      icon_color: >
+        {% set disk = states('sensor.disk_use_percent') | float(0) %}
+        {% if disk > 90 %}red{% elif disk > 75 %}orange{% else %}green{% endif %}
+    - type: custom:mushroom-template-card
+      primary: "{{ states('sensor.ha_version') }}"
+      secondary: "Versão HA"
+      icon: mdi:home-assistant
+      icon_color: cyan
+
+# ── Ações rápidas ─────────────────────────────────────────────
+- type: custom:mushroom-title-card
+  title: "⚡ Ações de Sistema"
+
+- type: horizontal-stack
+  cards:
+    - type: button
+      name: "Recarregar YAML"
+      icon: mdi:refresh
+      tap_action:
+        action: call-service
+        service: homeassistant.reload_config_entry
+      card_mod:
+        style: |
+          ha-card { border: 1px solid rgba(0,212,255,0.2) !important; }
+
+    - type: button
+      name: "Recarregar Automações"
+      icon: mdi:robot-outline
+      tap_action:
+        action: call-service
+        service: automation.reload
+      card_mod:
+        style: |
+          ha-card { border: 1px solid rgba(123,47,255,0.2) !important; }
+
+    - type: button
+      name: "Recarregar Tema"
+      icon: mdi:palette
+      tap_action:
+        action: call-service
+        service: frontend.reload_themes
+      card_mod:
+        style: |
+          ha-card { border: 1px solid rgba(0,255,136,0.2) !important; }

@@ -1,0 +1,364 @@
+# ══════════════════════════════════════════════════════════════
+#  VIEW: ENERGIA — Consumo e Gráficos
+# ══════════════════════════════════════════════════════════════
+
+- type: custom:mushroom-title-card
+  title: "⚡ Painel de Energia"
+  subtitle: "Monitoramento em tempo real do consumo elétrico"
+  card_mod:
+    style: |
+      ha-card { background: transparent !important; border: none !important; }
+
+# ── KPIs no topo ──────────────────────────────────────────────
+- type: horizontal-stack
+  cards:
+
+    - type: custom:mushroom-template-card
+      primary: "{{ states('sensor.consumo_diario_kwh') | round(2) }} kWh"
+      secondary: "⚡ Consumo Hoje"
+      icon: mdi:lightning-bolt
+      icon_color: cyan
+      badge_icon: mdi:calendar-today
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(0,212,255,0.08) 0%, rgba(0,212,255,0.02) 100%) !important;
+            border: 1px solid rgba(0,212,255,0.25) !important;
+            box-shadow: 0 0 20px rgba(0,212,255,0.08) !important;
+          }
+          .primary { font-size: 1.6rem !important; font-weight: 700; color: #00d4ff !important; }
+
+    - type: custom:mushroom-template-card
+      primary: "{{ states('sensor.consumo_mes_kwh') | round(1) }} kWh"
+      secondary: "📅 Este Mês"
+      icon: mdi:calendar-month
+      icon_color: purple
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(123,47,255,0.08) 0%, rgba(123,47,255,0.02) 100%) !important;
+            border: 1px solid rgba(123,47,255,0.25) !important;
+          }
+          .primary { font-size: 1.6rem !important; font-weight: 700; color: #7b2fff !important; }
+
+    - type: custom:mushroom-template-card
+      primary: "R$ {{ states('sensor.custo_mes_estimado') }}"
+      secondary: "💰 Custo Estimado"
+      icon: mdi:cash
+      icon_color: gold
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(255,215,0,0.08) 0%, rgba(255,215,0,0.02) 100%) !important;
+            border: 1px solid rgba(255,215,0,0.25) !important;
+          }
+          .primary { font-size: 1.6rem !important; font-weight: 700; color: #ffd700 !important; }
+
+    - type: custom:mushroom-template-card
+      primary: "Ar Condicionado"
+      secondary: "🔌 Maior Consumidor"
+      icon: mdi:air-conditioner
+      icon_color: red
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(255,51,102,0.08) 0%, rgba(255,51,102,0.02) 100%) !important;
+            border: 1px solid rgba(255,51,102,0.25) !important;
+          }
+          .primary { font-size: 1.1rem !important; font-weight: 700; color: #ff3366 !important; }
+
+# ── Gráfico 1: Consumo em tempo real (últimas 24h) ───────────
+- type: custom:mushroom-title-card
+  title: "📈 Consumo em Tempo Real"
+  subtitle: "Últimas 24 horas — atualiza a cada minuto"
+
+- type: custom:apexcharts-card
+  header:
+    show: true
+    title: "Consumo kWh — 24h"
+    show_states: true
+    colorize_states: true
+  update_interval: 60000
+  graph_span: 24h
+  apex_config:
+    chart:
+      type: area
+      height: 250
+      background: transparent
+      toolbar: { show: false }
+      animations:
+        enabled: true
+        speed: 800
+    theme: { mode: dark }
+    colors:
+      - "#00d4ff"
+    fill:
+      type: gradient
+      gradient:
+        shade: dark
+        type: vertical
+        shadeIntensity: 0.5
+        gradientToColors: ["#7b2fff"]
+        opacityFrom: 0.8
+        opacityTo: 0.1
+    stroke: { curve: smooth, width: 2 }
+    grid:
+      borderColor: "rgba(26,39,68,0.8)"
+      strokeDashArray: 4
+    xaxis:
+      labels: { style: { colors: "#8892b0" } }
+    yaxis:
+      labels:
+        formatter: "function(v){return v.toFixed(2)+' kWh'}"
+        style: { colors: "#8892b0" }
+    tooltip:
+      theme: dark
+      x: { format: "HH:mm" }
+  series:
+    - entity: sensor.consumo_diario_kwh
+      name: "Consumo"
+      color: "#00d4ff"
+      stroke_width: 2
+      type: area
+      extend_to: now
+  card_mod:
+    style: |
+      ha-card {
+        background: linear-gradient(135deg, #0d1321 0%, #111827 100%) !important;
+        border: 1px solid #1a2744 !important;
+      }
+
+# ── Gráfico 2: Top consumidores (barras horizontais) ─────────
+- type: custom:mushroom-title-card
+  title: "🔌 Consumo por Dispositivo"
+  subtitle: "Top 10 — kWh acumulado hoje"
+
+- type: custom:apexcharts-card
+  header:
+    show: true
+    title: "Top Consumidores"
+  apex_config:
+    chart:
+      type: bar
+      height: 300
+      background: transparent
+      toolbar: { show: false }
+    plotOptions:
+      bar:
+        horizontal: true
+        borderRadius: 6
+        distributed: true
+    theme: { mode: dark }
+    colors:
+      - "#00d4ff"
+      - "#7b2fff"
+      - "#00ff88"
+      - "#ffd700"
+      - "#ff3366"
+      - "#00d4ff"
+      - "#7b2fff"
+      - "#00ff88"
+      - "#ffd700"
+      - "#ff3366"
+    dataLabels:
+      enabled: true
+      formatter: "function(v){return v.toFixed(2)+' kWh'}"
+      style: { colors: ["#e8eaf6"] }
+    grid:
+      borderColor: "rgba(26,39,68,0.8)"
+    xaxis:
+      labels:
+        formatter: "function(v){return v.toFixed(2)+' kWh'}"
+        style: { colors: "#8892b0" }
+    yaxis:
+      labels: { style: { colors: "#8892b0" } }
+    tooltip: { theme: dark }
+    legend: { show: false }
+  series:
+    - name: "Consumo"
+      data:
+        - entity: sensor.consumo_ar_condicionado
+          name: "Ar Condicionado"
+        - entity: sensor.consumo_geladeira
+          name: "Geladeira"
+        - entity: sensor.consumo_tv_sala
+          name: "TV Sala"
+        - entity: sensor.consumo_computador
+          name: "Computador"
+        - entity: sensor.consumo_lava_loucas
+          name: "Lava-louças"
+        - entity: sensor.consumo_microondas
+          name: "Micro-ondas"
+        - entity: sensor.consumo_aquecedor
+          name: "Aquecedor"
+        - entity: sensor.consumo_som
+          name: "Sistema de Som"
+        - entity: sensor.consumo_luzes_total
+          name: "Luzes (Total)"
+        - entity: sensor.consumo_outros
+          name: "Outros"
+  card_mod:
+    style: |
+      ha-card {
+        background: linear-gradient(135deg, #0d1321 0%, #111827 100%) !important;
+        border: 1px solid #1a2744 !important;
+      }
+
+# ── Gráfico 3: Consumo semanal ────────────────────────────────
+- type: horizontal-stack
+  cards:
+
+    - type: custom:apexcharts-card
+      header:
+        show: true
+        title: "📊 Consumo Semanal (kWh)"
+      graph_span: 7d
+      apex_config:
+        chart:
+          type: bar
+          height: 220
+          background: transparent
+          toolbar: { show: false }
+        plotOptions:
+          bar:
+            borderRadius: 6
+            columnWidth: "60%"
+        theme: { mode: dark }
+        colors: ["#00d4ff"]
+        fill:
+          type: gradient
+          gradient:
+            shade: dark
+            type: vertical
+            gradientToColors: ["#7b2fff"]
+            opacityFrom: 1
+            opacityTo: 0.7
+        dataLabels: { enabled: false }
+        grid: { borderColor: "rgba(26,39,68,0.8)" }
+        xaxis:
+          type: datetime
+          labels:
+            format: "EEE"
+            style: { colors: "#8892b0" }
+        yaxis:
+          labels:
+            formatter: "function(v){return v.toFixed(1)+' kWh'}"
+            style: { colors: "#8892b0" }
+        tooltip: { theme: dark, x: { format: "dd/MM" } }
+      series:
+        - entity: sensor.consumo_diario_kwh
+          name: "Consumo Diário"
+          type: column
+          statistics:
+            type: sum
+            period: day
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, #0d1321 0%, #111827 100%) !important;
+            border: 1px solid #1a2744 !important;
+          }
+
+    # Gráfico rosca: Ativo vs Standby
+    - type: custom:apexcharts-card
+      header:
+        show: true
+        title: "🔄 Ativo vs Standby"
+      apex_config:
+        chart:
+          type: donut
+          height: 220
+          background: transparent
+        theme: { mode: dark }
+        colors: ["#00d4ff", "#1a2744"]
+        labels: ["Consumo Ativo", "Standby"]
+        legend:
+          show: true
+          labels: { colors: "#8892b0" }
+        plotOptions:
+          pie:
+            donut:
+              size: "70%"
+              labels:
+                show: true
+                total:
+                  show: true
+                  label: "Total"
+                  color: "#8892b0"
+                  formatter: "function(w){return w.globals.seriesTotals.reduce((a,b)=>a+b,0).toFixed(1)+' kWh'}"
+        dataLabels:
+          style: { colors: ["#e8eaf6"] }
+        tooltip: { theme: dark }
+      series:
+        - entity: sensor.consumo_ativo_kwh
+          name: "Ativo"
+        - entity: sensor.consumo_standby_kwh
+          name: "Standby"
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, #0d1321 0%, #111827 100%) !important;
+            border: 1px solid #1a2744 !important;
+          }
+
+# ── Gráfico 4: Tempo ligado na semana ────────────────────────
+- type: custom:mushroom-title-card
+  title: "⏱️ Tempo Ligado na Semana"
+  subtitle: "Horas ativas por dispositivo"
+
+- type: custom:apexcharts-card
+  header:
+    show: true
+    title: "Horas Ativas — 7 dias"
+  graph_span: 7d
+  apex_config:
+    chart:
+      type: area
+      height: 200
+      background: transparent
+      toolbar: { show: false }
+    theme: { mode: dark }
+    colors:
+      - "#00d4ff"
+      - "#7b2fff"
+      - "#00ff88"
+      - "#ffd700"
+    stroke: { curve: smooth, width: 2 }
+    fill:
+      type: gradient
+      gradient:
+        shade: dark
+        opacityFrom: 0.5
+        opacityTo: 0.05
+    grid: { borderColor: "rgba(26,39,68,0.8)" }
+    xaxis:
+      type: datetime
+      labels:
+        format: "dd/MM"
+        style: { colors: "#8892b0" }
+    yaxis:
+      labels:
+        formatter: "function(v){return v.toFixed(0)+'h'}"
+        style: { colors: "#8892b0" }
+    tooltip: { theme: dark }
+    legend:
+      labels: { colors: "#8892b0" }
+  series:
+    - entity: sensor.horas_ligado_ar_condicionado
+      name: "Ar Condicionado"
+      color: "#00d4ff"
+    - entity: sensor.horas_ligado_computador
+      name: "Computador"
+      color: "#7b2fff"
+    - entity: sensor.horas_ligado_tv
+      name: "TV"
+      color: "#00ff88"
+    - entity: sensor.horas_ligado_luzes
+      name: "Luzes"
+      color: "#ffd700"
+  card_mod:
+    style: |
+      ha-card {
+        background: linear-gradient(135deg, #0d1321 0%, #111827 100%) !important;
+        border: 1px solid #1a2744 !important;
+      }

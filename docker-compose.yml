@@ -1,0 +1,200 @@
+# ══════════════════════════════════════════════════════════════
+#  docker-compose.yml — Stack Completa Home Assistant
+#  Serviços: HA + PostgreSQL + InfluxDB + Grafana + Frigate
+#  Compatível com: Coolify, Portainer, VPS direto
+# ══════════════════════════════════════════════════════════════
+
+version: "3.9"
+
+services:
+
+  # ── Home Assistant ────────────────────────────────────────
+  homeassistant:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Alternativa sem build (imagem oficial direta):
+    # image: ghcr.io/home-assistant/home-assistant:stable
+    container_name: homeassistant
+    hostname: homeassistant
+    privileged: true          # necessário para USB/Bluetooth/Zigbee
+    network_mode: host        # necessário para mDNS / descoberta de dispositivos
+    environment:
+      - TZ=${TZ:-America/Sao_Paulo}
+    volumes:
+      - ./config:/config                      # configurações persistentes
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro               # Bluetooth
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    labels:
+      # Coolify / Traefik
+      - "traefik.enable=true"
+      - "traefik.http.routers.homeassistant.rule=Host(`${HA_DOMAIN:-homeassistant.localhost}`)"
+      - "traefik.http.routers.homeassistant.tls=true"
+      - "traefik.http.routers.homeassistant.tls.certresolver=letsencrypt"
+      - "traefik.http.services.homeassistant.loadbalancer.server.port=8123"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8123/api/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  # ── PostgreSQL — Banco de histórico HA ────────────────────
+  db:
+    image: postgres:15-alpine
+    container_name: ha-postgres
+    hostname: ha-postgres
+    environment:
+      POSTGRES_DB: homeassistant
+      POSTGRES_USER: ${DB_USER:-hauser}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD obrigatório no .env}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "127.0.0.1:5432:5432"  # exposto apenas localmente
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-hauser} -d homeassistant"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ── InfluxDB — Métricas de longo prazo ────────────────────
+  influxdb:
+    image: influxdb:2.7-alpine
+    container_name: ha-influxdb
+    hostname: ha-influxdb
+    ports:
+      - "8086:8086"
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: ${INFLUX_USER:-admin}
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUX_PASSWORD:?INFLUX_PASSWORD obrigatório}
+      DOCKER_INFLUXDB_INIT_ORG: homeassistant
+      DOCKER_INFLUXDB_INIT_BUCKET: ha_metrics
+      DOCKER_INFLUXDB_INIT_RETENTION: 365d  # 1 ano de retenção
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUX_TOKEN:-meu-token-influx}
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+      - influxdb_config:/etc/influxdb2
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "influx", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # ── Grafana — Dashboards avançados ────────────────────────
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: ha-grafana
+    hostname: ha-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:?GRAFANA_PASSWORD obrigatório}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_SERVER_ROOT_URL: ${GRAFANA_URL:-http://localhost:3001}
+      GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-worldmap-panel"
+      TZ: ${TZ:-America/Sao_Paulo}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      influxdb:
+        condition: service_healthy
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.rule=Host(`${GRAFANA_DOMAIN:-grafana.localhost}`)"
+
+  # ── Frigate NVR — Câmeras com IA ──────────────────────────
+  frigate:
+    image: ghcr.io/blakeblackshear/frigate:stable
+    container_name: ha-frigate
+    hostname: ha-frigate
+    privileged: true           # acesso à GPU/Coral TPU
+    shm_size: "256mb"          # shared memory para processamento de vídeo
+    devices:
+      - /dev/bus/usb:/dev/bus/usb   # Coral USB TPU (se disponível)
+      # - /dev/dri/renderD128        # Intel GPU (descomente se usar)
+    volumes:
+      - ./frigate:/config
+      - ./media/frigate:/media/frigate
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "5000:5000"    # UI Frigate
+      - "8554:8554"    # RTSP restream
+      - "8555:8555/tcp"  # WebRTC
+      - "8555:8555/udp"
+    environment:
+      FRIGATE_RTSP_PASSWORD: ${FRIGATE_RTSP_PASSWORD:-password}
+      TZ: ${TZ:-America/Sao_Paulo}
+    restart: unless-stopped
+
+  # ── Redis — Cache e pub/sub ───────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: ha-redis
+    hostname: ha-redis
+    ports:
+      - "127.0.0.1:6379:6379"
+    command: >
+      redis-server
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --requirepass ${REDIS_PASSWORD:-redis_password}
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redis_password}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ── Nginx Proxy Manager (opcional — alternativa ao Traefik)
+  # nginx:
+  #   image: jc21/nginx-proxy-manager:latest
+  #   container_name: ha-nginx
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #     - "81:81"   # Admin UI
+  #   volumes:
+  #     - nginx_data:/data
+  #     - nginx_letsencrypt:/etc/letsencrypt
+  #   restart: unless-stopped
+
+# ── Volumes persistentes ──────────────────────────────────
+volumes:
+  postgres_data:
+    driver: local
+  influxdb_data:
+    driver: local
+  influxdb_config:
+    driver: local
+  grafana_data:
+    driver: local
+  redis_data:
+    driver: local
+  # nginx_data:
+  # nginx_letsencrypt:
+
+# ── Rede interna ──────────────────────────────────────────
+# Nota: como o HA usa network_mode: host, outros serviços
+# se comunicam via localhost ou pelo IP do host
+networks:
+  default:
+    name: ha-network
+    driver: bridge

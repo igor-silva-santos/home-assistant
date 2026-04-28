@@ -1,0 +1,103 @@
+# ══════════════════════════════════════════════════════════════
+#  CARD: STATS BAR — Barra de estatísticas reutilizável
+#  Layout: horizontal-stack de mushroom-stat-card
+# ══════════════════════════════════════════════════════════════
+#
+# Exemplo de uso (substitua os entities):
+#   - type: horizontal-stack
+#     cards:
+#       - type: custom:mushroom-template-card
+#         primary: "{{ states('sensor.consumo_diario_kwh') | round(2) }} kWh"
+#         secondary: "Hoje"
+#         icon: mdi:flash
+#         icon_color: cyan
+#         card_mod: !include lovelace/cards/stats-bar.yaml  # apenas o style block
+#
+
+# Referência de estilos para os mushroom-template-card de estatísticas
+# Use este arquivo como referência, copie o card_mod.style abaixo
+
+card_mod:
+  style: |
+    ha-card {
+      background: linear-gradient(135deg, var(--card-bg, #0d1321) 0%, var(--card-bg-2, #111827) 100%) !important;
+      border: 1px solid var(--card-border, #1a2744) !important;
+      border-radius: 14px !important;
+      transition: all 0.3s ease !important;
+    }
+    ha-card:hover {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4) !important;
+    }
+    mushroom-shape-icon {
+      --icon-color: var(--stat-color, #00d4ff) !important;
+      --shape-color: var(--stat-bg, rgba(0,212,255,0.12)) !important;
+    }
+    .primary {
+      font-size: 1.4rem !important;
+      font-weight: 700 !important;
+      color: var(--stat-color, #00d4ff) !important;
+      letter-spacing: -0.02em !important;
+    }
+    .secondary {
+      font-size: 0.75rem !important;
+      color: #8892b0 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.06em !important;
+    }
+
+# ── Templates prontos de stats bar ───────────────────────────
+
+# Stat Card: Consumo (ciano)
+consumo_template:
+  type: custom:mushroom-template-card
+  primary: "{{ states(entity) | round(2) }} kWh"
+  secondary: "{{ label | default('Consumo') }}"
+  icon: mdi:flash
+  icon_color: cyan
+  card_mod:
+    style: |
+      ha-card {
+        background: linear-gradient(135deg, rgba(0,212,255,0.08) 0%, rgba(0,212,255,0.02) 100%) !important;
+        border: 1px solid rgba(0,212,255,0.2) !important;
+        border-radius: 14px !important;
+      }
+      .primary { font-size: 1.4rem !important; font-weight: 700 !important; color: #00d4ff !important; }
+      .secondary { font-size: 0.75rem !important; color: #8892b0 !important; text-transform: uppercase !important; }
+      mushroom-shape-icon { --icon-color: #00d4ff !important; --shape-color: rgba(0,212,255,0.12) !important; }
+
+# Stat Card: Custo (dourado)
+custo_template:
+  type: custom:mushroom-template-card
+  primary: "R$ {{ states(entity) }}"
+  secondary: "{{ label | default('Custo Estimado') }}"
+  icon: mdi:cash
+  icon_color: gold
+  card_mod:
+    style: |
+      ha-card {
+        background: linear-gradient(135deg, rgba(255,215,0,0.08) 0%, rgba(255,215,0,0.02) 100%) !important;
+        border: 1px solid rgba(255,215,0,0.2) !important;
+        border-radius: 14px !important;
+      }
+      .primary { font-size: 1.4rem !important; font-weight: 700 !important; color: #ffd700 !important; }
+      .secondary { font-size: 0.75rem !important; color: #8892b0 !important; text-transform: uppercase !important; }
+      mushroom-shape-icon { --icon-color: #ffd700 !important; --shape-color: rgba(255,215,0,0.12) !important; }
+
+# Stat Card: Dispositivos (roxo)
+dispositivos_template:
+  type: custom:mushroom-template-card
+  primary: "{{ states(entity) }}"
+  secondary: "{{ label | default('Dispositivos') }}"
+  icon: mdi:devices
+  icon_color: purple
+  card_mod:
+    style: |
+      ha-card {
+        background: linear-gradient(135deg, rgba(123,47,255,0.08) 0%, rgba(123,47,255,0.02) 100%) !important;
+        border: 1px solid rgba(123,47,255,0.2) !important;
+        border-radius: 14px !important;
+      }
+      .primary { font-size: 1.4rem !important; font-weight: 700 !important; color: #7b2fff !important; }
+      .secondary { font-size: 0.75rem !important; color: #8892b0 !important; text-transform: uppercase !important; }
+      mushroom-shape-icon { --icon-color: #7b2fff !important; --shape-color: rgba(123,47,255,0.12) !important; }

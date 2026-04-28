@@ -1,0 +1,168 @@
+futuristic_dark:
+  # ══════════════════════════════════════════════════════════════
+  #  FUTURISTIC DARK — Home Assistant Custom Theme
+  #  Versão: 2.0  |  Compatível: HA 2024+
+  # ══════════════════════════════════════════════════════════════
+
+  # ── Cores base ──────────────────────────────────────────────
+  primary-background-color: "#070b14"
+  secondary-background-color: "#0d1321"
+  card-background-color: "#0d1321"
+  divider-color: "#1a2744"
+
+  # ── Texto ────────────────────────────────────────────────────
+  primary-text-color: "#e8eaf6"
+  secondary-text-color: "#8892b0"
+  disabled-text-color: "#3d4a6b"
+  text-primary-color: "#e8eaf6"
+
+  # ── Accent / Destaque ciano elétrico ─────────────────────────
+  primary-color: "#00d4ff"
+  accent-color: "#00d4ff"
+  dark-primary-color: "#0098cc"
+  light-primary-color: "#64e8ff"
+
+  # ── Estado dos elementos ─────────────────────────────────────
+  state-active-color: "#00d4ff"
+  state-inactive-color: "#3d4a6b"
+  state-on-color: "#00ff88"
+  state-off-color: "#3d4a6b"
+  state-unavailable-color: "#ff3366"
+
+  # ── Header / Sidebar ─────────────────────────────────────────
+  header-background-color: "#070b14"
+  header-text-color: "#e8eaf6"
+  sidebar-background-color: "#070b14"
+  sidebar-text-color: "#8892b0"
+  sidebar-selected-text-color: "#00d4ff"
+  sidebar-icon-color: "#8892b0"
+  sidebar-selected-icon-color: "#00d4ff"
+
+  # ── Cards ────────────────────────────────────────────────────
+  ha-card-background: "#0d1321"
+  ha-card-border-radius: "16px"
+  ha-card-border-color: "#1a2744"
+  ha-card-border-width: "1px"
+  ha-card-box-shadow: "0 0 20px rgba(0, 212, 255, 0.05), 0 4px 24px rgba(0, 0, 0, 0.4)"
+
+  # ── Inputs / Formulários ─────────────────────────────────────
+  input-background-color: "#111827"
+  input-fill-color: "#111827"
+  input-ink-color: "#e8eaf6"
+  input-label-ink-color: "#8892b0"
+  input-outlined-border-color: "#1a2744"
+  input-outlined-hover-border-color: "#00d4ff"
+
+  # ── Switch / Toggle ──────────────────────────────────────────
+  switch-checked-color: "#00d4ff"
+  switch-checked-button-color: "#ffffff"
+  switch-checked-track-color: "rgba(0, 212, 255, 0.3)"
+  switch-unchecked-color: "#3d4a6b"
+  switch-unchecked-button-color: "#8892b0"
+  switch-unchecked-track-color: "#1a2744"
+
+  # ── Slider ───────────────────────────────────────────────────
+  paper-slider-active-color: "#00d4ff"
+  paper-slider-secondary-color: "rgba(0, 212, 255, 0.3)"
+  paper-slider-knob-color: "#00d4ff"
+  paper-slider-knob-start-color: "#1a2744"
+  paper-slider-pin-color: "#00d4ff"
+  paper-slider-font-color: "#070b14"
+
+  # ── Ripple ───────────────────────────────────────────────────
+  paper-item-icon-color: "#8892b0"
+  paper-item-icon-active-color: "#00d4ff"
+  paper-ripple-opacity: "0.1"
+
+  # ── Labels / Chips ───────────────────────────────────────────
+  label-badge-background-color: "#0d1321"
+  label-badge-text-color: "#e8eaf6"
+  label-badge-red: "#ff3366"
+  label-badge-green: "#00ff88"
+  label-badge-blue: "#00d4ff"
+  label-badge-yellow: "#ffd700"
+  label-badge-gray: "#3d4a6b"
+
+  # ── Scrollbar ────────────────────────────────────────────────
+  scrollbar-thumb-color: "#1a2744"
+
+  # ── Mapa ─────────────────────────────────────────────────────
+  map-filter: "brightness(0.7) invert(1) hue-rotate(180deg)"
+
+  # ══════════════════════════════════════════════════════════════
+  #  VARIÁVEIS CSS CUSTOMIZADAS
+  # ══════════════════════════════════════════════════════════════
+  modes:
+    dark:
+      # Paleta principal
+      "--ft-bg-deep": "#070b14"
+      "--ft-bg-card": "#0d1321"
+      "--ft-bg-card-hover": "#111827"
+      "--ft-border": "#1a2744"
+      "--ft-border-glow": "#00d4ff"
+
+      # Neon palette
+      "--ft-cyan": "#00d4ff"
+      "--ft-cyan-dim": "rgba(0, 212, 255, 0.15)"
+      "--ft-cyan-glow": "0 0 12px rgba(0, 212, 255, 0.6), 0 0 32px rgba(0, 212, 255, 0.2)"
+      "--ft-purple": "#7b2fff"
+      "--ft-purple-dim": "rgba(123, 47, 255, 0.15)"
+      "--ft-purple-glow": "0 0 12px rgba(123, 47, 255, 0.6)"
+      "--ft-green": "#00ff88"
+      "--ft-green-dim": "rgba(0, 255, 136, 0.15)"
+      "--ft-green-glow": "0 0 12px rgba(0, 255, 136, 0.5)"
+      "--ft-red": "#ff3366"
+      "--ft-red-dim": "rgba(255, 51, 102, 0.15)"
+      "--ft-red-glow": "0 0 12px rgba(255, 51, 102, 0.5)"
+      "--ft-gold": "#ffd700"
+      "--ft-gold-dim": "rgba(255, 215, 0, 0.15)"
+
+      # Texto
+      "--ft-text-primary": "#e8eaf6"
+      "--ft-text-secondary": "#8892b0"
+      "--ft-text-dim": "#3d4a6b"
+      "--ft-text-glow": "#00d4ff"
+
+      # Gradientes
+      "--ft-gradient-card": "linear-gradient(135deg, #0d1321 0%, #111827 100%)"
+      "--ft-gradient-hero": "linear-gradient(135deg, #070b14 0%, #0d1321 50%, #0a1628 100%)"
+      "--ft-gradient-cyan": "linear-gradient(135deg, rgba(0,212,255,0.1) 0%, rgba(0,212,255,0.02) 100%)"
+      "--ft-gradient-purple": "linear-gradient(135deg, rgba(123,47,255,0.1) 0%, rgba(123,47,255,0.02) 100%)"
+
+      # Tipografia
+      "--ft-font": "'Rajdhani', 'Orbitron', system-ui, sans-serif"
+      "--ft-font-mono": "'Courier New', monospace"
+      "--ft-font-size-xs": "0.7rem"
+      "--ft-font-size-sm": "0.85rem"
+      "--ft-font-size-md": "1rem"
+      "--ft-font-size-lg": "1.3rem"
+      "--ft-font-size-xl": "1.8rem"
+      "--ft-font-size-2xl": "2.4rem"
+
+      # Bordas e raios
+      "--ft-radius-sm": "8px"
+      "--ft-radius-md": "12px"
+      "--ft-radius-lg": "16px"
+      "--ft-radius-xl": "24px"
+      "--ft-radius-full": "9999px"
+
+      # Sombras dos cards
+      "--ft-shadow-card": "0 4px 24px rgba(0,0,0,0.4), 0 0 0 1px #1a2744"
+      "--ft-shadow-active": "0 0 20px rgba(0,212,255,0.3), 0 4px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,212,255,0.4)"
+      "--ft-shadow-hover": "0 8px 32px rgba(0,0,0,0.5), 0 0 16px rgba(0,212,255,0.15)"
+
+      # Transições
+      "--ft-transition": "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+      "--ft-transition-fast": "all 0.15s ease"
+
+      # Mushroom cards overrides
+      "--mush-card-primary-color": "#00d4ff"
+      "--mush-card-secondary-color": "#8892b0"
+      "--mush-rgb-card-background-color": "13, 19, 33"
+      "--mush-chip-background": "#1a2744"
+      "--mush-chip-border-radius": "8px"
+
+      # ApexCharts overrides
+      "--apex-chart-background": "#0d1321"
+      "--apex-chart-foreground": "#e8eaf6"
+      "--apex-chart-grid-color": "rgba(26, 39, 68, 0.8)"
