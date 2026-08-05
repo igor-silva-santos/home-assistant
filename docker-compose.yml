@@ -18,13 +18,15 @@ services:
     container_name: homeassistant
     hostname: homeassistant
     privileged: true          # necessário para USB/Bluetooth/Zigbee
-    network_mode: host        # necessário para mDNS / descoberta de dispositivos
+    # network_mode: host      # Comentado para compatibilidade total no Windows
+    ports:
+      - "8123:8123"
     environment:
       - TZ=${TZ:-America/Sao_Paulo}
     volumes:
       - ./config:/config                      # configurações persistentes
       - /etc/localtime:/etc/localtime:ro
-      - /run/dbus:/run/dbus:ro               # Bluetooth
+      # - /run/dbus:/run/dbus:ro               # Bluetooth (pode falhar no Windows)
     restart: unless-stopped
     depends_on:
       db:
@@ -57,7 +59,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ports:
-      - "127.0.0.1:5432:5432"  # exposto apenas localmente
+      - "5432:5432"  # exposto para que o HA acesse via bridge
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-hauser} -d homeassistant"]
