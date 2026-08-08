@@ -166,7 +166,7 @@ Entidades geradas pelo Frigate:
 1. HACS → Integrações → buscar: **Huawei LTE**
 2. Instalar e reiniciar o HA
 3. HA → Configurações → Integrações → **Huawei LTE**
-4. Informar IP do roteador (ex: `192.168.3.1`), usuário `admin` e senha
+4. Informar IP do roteador (ex.: `192.168.x.x`), usuário e senha definidos no seu ambiente
 
 Entidades esperadas pelo dashboard:
 ```
