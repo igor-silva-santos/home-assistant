@@ -1,3 +1,32 @@
 .env
 config/
 frigate/
+
+# Local notes / scratch (kept on machine, not on GitHub)
+ANALISE_*.md
+*_AUDIT.md
+*_ANALYSIS.md
+PROGRESSO.md
+COISAS_PARA_FAZER.md
+AGENTS.md
+CLAUDE.md
+FuncionalidadesDoProjeto.md
+contexto-projeto.md
+output.log
+HunterFit_Master_Spec.md
+PROJECT_AUDIT.md
+watchlist_spec.md
+plano_de_teste_detalhado.md
+PROJETO_COMPLETO_README.md
+CHANGELOG_MIGRACAO.md
+erros_console.md
+log_sync.md
+super_modal_analysis.md
+Detalhes_Frontend_e_Checklist_icones.md
+Orbe_Nerd - Documento de Especificação Técnica*
+docs/backlog.md
+docs/MIGRACAO_E_FUTURO.md
+frontend/BACKEND_INTEGRATION.md
+frontend/IMPLEMENTACAO_ICONES.md
+frontend/INTEGRACAO_BACKEND.md
+api/TMDB_API_ANALYSIS.md
