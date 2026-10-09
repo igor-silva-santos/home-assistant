@@ -1,0 +1,59 @@
+# Frigate — exemplo com zonas para alertas J.A.R.V.I.S / HA
+# Copie para frigate/config.yml (pasta local, gitignored) e ajuste RTSP
+
+mqtt:
+  enabled: false
+
+detectors:
+  cpu:
+    type: cpu
+    num_threads: 3
+
+cameras:
+  camera_01:
+    enabled: true
+    ffmpeg:
+      inputs:
+        - path: rtsp://usuario:senha@IP_CAM_ENTRADA:554/stream1
+          roles:
+            - detect
+            - record
+    detect:
+      width: 1280
+      height: 720
+      fps: 5
+    objects:
+      track:
+        - person
+        - car
+    zones:
+      entrada_portao:
+        coordinates: 0,461,3,0,1916,0,1916,1068,0,1068
+        objects:
+          - person
+      calcada:
+        coordinates: 100,400,800,400,800,700,100,700
+        objects:
+          - person
+          - car
+
+  camera_02:
+    enabled: true
+    ffmpeg:
+      inputs:
+        - path: rtsp://usuario:senha@IP_CAM_QUINTAL:554/stream1
+          roles:
+            - detect
+    zones:
+      quintal_lateral:
+        coordinates: 0,0,1920,0,1920,1080,0,1080
+        objects:
+          - person
+
+record:
+  enabled: true
+  retain:
+    days: 7
+
+snapshots:
+  enabled: true

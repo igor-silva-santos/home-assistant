@@ -151,7 +151,7 @@
         {% if is_state('input_boolean.alarme_ativo','on') %}green{% else %}red{% endif %}
       tap_action:
         action: navigate
-        navigation_path: /lovelace/config
+        navigation_path: /lovelace/logs
       card_mod:
         style: |
           ha-card {

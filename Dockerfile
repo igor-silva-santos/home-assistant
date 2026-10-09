@@ -14,6 +14,7 @@ LABEL version="2.0"
 COPY ./themes       /config/themes
 COPY ./www          /config/www
 COPY ./lovelace     /config/lovelace
+COPY ./packages     /config/packages
 COPY ./docs         /config/docs
 
 # Arquivos de configuração principais
@@ -23,6 +24,7 @@ COPY automations.yaml     /config/automations.yaml
 
 # Scripts utilitários
 COPY scripts/setup.sh /config/setup.sh
+COPY scripts/jarvis.yaml /config/scripts/jarvis.yaml
 RUN chmod +x /config/setup.sh
 
 # Volumes — dados persistentes ficam fora da imagem

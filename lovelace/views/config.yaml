@@ -79,6 +79,47 @@
         style: |
           ha-card { border: 1px solid #1a2744 !important; }
 
+# ── J.A.R.V.I.S ───────────────────────────────────────────────
+- type: custom:mushroom-title-card
+  title: "🤖 J.A.R.V.I.S"
+  subtitle: "Integração com sua IA — vigilância, rotinas e interfone"
+
+- type: horizontal-stack
+  cards:
+    - type: custom:mushroom-entity-card
+      entity: input_boolean.jarvis_ativo
+      name: "J.A.R.V.I.S ativo"
+      icon: mdi:robot-happy
+      tap_action:
+        action: toggle
+    - type: custom:mushroom-entity-card
+      entity: input_boolean.jarvis_modo_vigilancia
+      name: "Vigilância câmeras"
+      icon: mdi:cctv
+      tap_action:
+        action: toggle
+    - type: custom:mushroom-template-card
+      primary: "{{ states('sensor.jarvis_status') }}"
+      secondary: "{{ states('input_text.jarvis_ultimo_evento') }}"
+      icon: mdi:access-point
+      icon_color: cyan
+
+- type: entities
+  title: "Zonas com alerta de movimento"
+  entities:
+    - entity: input_text.jarvis_zonas_alerta
+      name: "Zonas (vírgula)"
+    - entity: input_text.jarvis_callback_url
+      name: "URL callback PC local (Tailscale)"
+    - entity: input_datetime.jarvis_ultima_sincronizacao
+      name: "Última sincronização bridge"
+  card_mod:
+    style: |
+      ha-card {
+        background: linear-gradient(135deg, #0d1321 0%, #111827 100%) !important;
+        border: 1px solid #1a2744 !important;
+      }
+
 # ── Energia ───────────────────────────────────────────────────
 - type: custom:mushroom-title-card
   title: "⚡ Configurações de Energia"

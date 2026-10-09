@@ -1,0 +1,53 @@
+# Rastreamento de duração ligado/desligado por dispositivo (template)
+
+template:
+  - sensor:
+      - name: "tv_sala_ligada_desde"
+        unique_id: tv_sala_ligada_desde
+        state: >
+          {% if is_state('switch.tv_sala', 'on') %}
+            {{ (as_timestamp(now()) - as_timestamp(states.switch.tv_sala.last_changed)) | int }}
+          {% else %}0{% endif %}
+        unit_of_measurement: "s"
+        icon: mdi:television
+
+      - name: "tv_sala_offline_desde"
+        unique_id: tv_sala_offline_desde
+        state: >
+          {% if states('switch.tv_sala') in ['unavailable', 'unknown'] %}
+            {{ (as_timestamp(now()) - as_timestamp(states.switch.tv_sala.last_changed)) | int }}
+          {% else %}0{% endif %}
+        unit_of_measurement: "s"
+        icon: mdi:television-off
+
+      - name: "computador_ligado_desde"
+        unique_id: computador_ligado_desde
+        state: >
+          {% if is_state('switch.computador', 'on') %}
+            {{ (as_timestamp(now()) - as_timestamp(states.switch.computador.last_changed)) | int }}
+          {% else %}0{% endif %}
+        unit_of_measurement: "s"
+        icon: mdi:desktop-tower
+
+      - name: "ar_condicionado_ligado_desde"
+        unique_id: ar_condicionado_ligado_desde
+        state: >
+          {% if is_state('switch.ar_condicionado_quarto', 'on') %}
+            {{ (as_timestamp(now()) - as_timestamp(states.switch.ar_condicionado_quarto.last_changed)) | int }}
+          {% else %}0{% endif %}
+        unit_of_measurement: "s"
+        icon: mdi:air-conditioner
+
+  - binary_sensor:
+      - name: "tv_sala_ligada"
+        unique_id: tv_sala_ligada_bin
+        device_class: power
+        state: "{{ is_state('switch.tv_sala', 'on') }}"
+      - name: "computador_ligado"
+        unique_id: computador_ligado_bin
+        device_class: power
+        state: "{{ is_state('switch.computador', 'on') }}"
+      - name: "ar_condicionado_ligado"
+        unique_id: ar_condicionado_ligado_bin
+        device_class: power
+        state: "{{ is_state('switch.ar_condicionado_quarto', 'on') }}"

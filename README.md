@@ -23,6 +23,8 @@ Setup de Home Assistant com Docker, dashboards Lovelace, Frigate e monitoramento
 - Energia e consumo
 - Automações
 - Segurança / câmeras (Frigate)
+- **Canal de Logs** (offline, tempo ligado, energia)
+- **J.A.R.V.I.S** (webhooks, Redis, bridge HTTP)
 
 ## Setup rápido
 
@@ -32,10 +34,14 @@ Setup de Home Assistant com Docker, dashboards Lovelace, Frigate e monitoramento
 4. Instale custom cards via HACS (ver `docs/CUSTOM-CARDS.md`)
 5. Ative o tema desejado no perfil
 
-Detalhes: [`docs/SETUP.md`](./docs/SETUP.md) · [`docs/DOCKER-VPS.md`](./docs/DOCKER-VPS.md)
+Detalhes: [`docs/SETUP.md`](./docs/SETUP.md) · [`docs/DOCKER-VPS.md`](./docs/DOCKER-VPS.md) · [`docs/JARVIS-INTEGRATION.md`](./docs/JARVIS-INTEGRATION.md) · [**HA VPS + J.A.R.V.I.S local**](./docs/JARVIS-LOCAL-VPS.md)
 
 ## Roadmap
 
+- [x] Canal de logs (offline / acionamento / energia)
+- [x] Layout responsivo (celular, tablet, desktop)
+- [x] Alertas por zona Frigate + push
+- [x] Ponte J.A.R.V.I.S (webhook + Redis + REST)
 - [ ] Aceleração Coral TPU no Frigate
 - [ ] Energy Dashboard nativo
 - [ ] Mais dispositivos Matter
