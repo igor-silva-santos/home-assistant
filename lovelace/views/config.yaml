@@ -109,6 +109,8 @@
   entities:
     - entity: input_text.jarvis_zonas_alerta
       name: "Zonas (vírgula)"
+    - entity: input_text.jarvis_callback_url
+      name: "URL callback PC local (Tailscale)"
     - entity: input_datetime.jarvis_ultima_sincronizacao
       name: "Última sincronização bridge"
   card_mod:

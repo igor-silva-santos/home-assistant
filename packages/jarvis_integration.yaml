@@ -26,6 +26,12 @@ input_text:
     name: "J.A.R.V.I.S — Zonas com alerta"
     max: 255
     initial: "entrada,quintal,garagem"
+  # URL pública ou Tailscale do PC local (ex: http://100.x.x.x:8765/ha-events)
+  # Deixe vazio se o J.A.R.V.I.S só usar WebSocket (pull) — ver docs/JARVIS-LOCAL-VPS.md
+  jarvis_callback_url:
+    name: "J.A.R.V.I.S — URL callback (PC local)"
+    max: 255
+    initial: ""
 
 input_datetime:
   jarvis_ultima_sincronizacao:
@@ -47,7 +53,13 @@ webhook:
 
 rest_command:
   jarvis_notificar:
-    url: "{{ states('sensor.jarvis_bridge_url') | default('http://jarvis-bridge:8090/events', true) }}"
+    url: >
+      {% set cb = states('input_text.jarvis_callback_url') | trim %}
+      {% if cb | length > 8 %}
+        {{ cb }}
+      {% else %}
+        {{ states('sensor.jarvis_bridge_url') | default('http://jarvis-bridge:8090/events', true) }}
+      {% endif %}
     method: POST
     content_type: "application/json"
     payload: >

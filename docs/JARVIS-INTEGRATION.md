@@ -1,14 +1,23 @@
 # Integração J.A.R.V.I.S ↔ Home Assistant
 
-Esta stack expõe a casa para sua IA de forma **segura e auditável**: webhooks, scripts, Redis e REST.
+> **HA na VPS + J.A.R.V.I.S no PC?** Leia primeiro: [**JARVIS-LOCAL-VPS.md**](./JARVIS-LOCAL-VPS.md)  
+> Cliente pronto: pasta [`jarvis-local/`](../jarvis-local/).
 
-## Arquitetura
+Esta stack expõe a casa para sua IA de forma **segura e auditável**: webhooks, scripts, Redis (opcional na VPS) e REST.
+
+## Arquitetura (resumo)
+
+**Cenário recomendado (J.A.R.V.I.S local):**
 
 ```
-Home Assistant ──rest_command──► jarvis-bridge:8090/events ──► Redis (jarvis:events)
-       ▲                              │
-       │                              └── WebSocket (state_changed espelhado)
-       └── POST /api/services/... ◄── sua IA (token long-lived)
+PC local — J.A.R.V.I.S  ──WSS/HTTPS──►  VPS — Home Assistant
+         (client.py)      pull eventos      (24/7)
+```
+
+**Opcional na VPS (debug / Redis interno):**
+
+```
+HA ──rest_command──► jarvis-bridge:8090 ──► Redis (jarvis:events)
 ```
 
 ## 1. Token de acesso (obrigatório)
@@ -46,7 +55,13 @@ Também é possível chamar scripts:
 | `script.jarvis_atender_interfone` | Snapshot + push; `abrir_porteira` opcional |
 | `script.jarvis_publicar_evento` | Envia evento ao bridge Redis |
 
-## 4. Consumir eventos na sua IA (Redis)
+## 4. Consumir eventos na sua IA
+
+### PC local (recomendado)
+
+Use `jarvis-local/client.py` — WebSocket para `wss://SEU_HA/api/websocket`.
+
+### Redis (só se bridge rodar na mesma máquina que a IA)
 
 Canal padrão: `jarvis:events`
 
@@ -104,5 +119,6 @@ Aba **Logs**: card `device-channel-card` com offline, tempo no estado e potênci
 ## Segurança
 
 - Não exponha webhooks publicamente sem reverse proxy + TLS
-- Use token só no backend da IA, nunca no app mobile
-- Restrinja `local_only: true` nos webhooks se a IA rodar na mesma rede
+- Use token só no backend da IA (PC local), nunca no app mobile
+- **Não** publique Redis nem porta 8090 na WAN — J.A.R.V.I.S conecta **para fora** na VPS
+- Push para o PC: use **Tailscale** + `input_text.jarvis_callback_url` (ex. `http://100.x.x.x:8765/ha-events`)

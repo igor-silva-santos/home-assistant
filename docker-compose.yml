@@ -144,8 +144,9 @@ services:
       TZ: ${TZ:-America/Sao_Paulo}
     restart: unless-stopped
 
-  # ── Redis — Cache e pub/sub ───────────────────────────────
-  # ── J.A.R.V.I.S Bridge — eventos HA ↔ Redis ↔ sua IA ───────
+  # ── J.A.R.V.I.S Bridge (OPCIONAL na VPS) ───────────────────
+  # J.A.R.V.I.S no PC local deve usar WebSocket → HA (jarvis-local/client.py).
+  # Bridge/Redis: debug interno na VPS; NÃO exponha na internet.
   jarvis-bridge:
     build:
       context: ./jarvis-bridge
@@ -159,7 +160,7 @@ services:
       JARVIS_REDIS_CHANNEL: jarvis:events
       PORT: 8090
     ports:
-      - "8090:8090"
+      - "127.0.0.1:8090:8090"
     depends_on:
       redis:
         condition: service_healthy
