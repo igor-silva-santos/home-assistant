@@ -42,25 +42,31 @@ views:
     panel: false
     cards: !include lovelace/views/energia.yaml
 
-  # ── 4. Relatórios ─────────────────────────────────────────
+  # ── 4. Canal de Logs ──────────────────────────────────────
+  - title: "Logs"
+    path: logs
+    icon: mdi:transmission-tower
+    cards: !include lovelace/views/logs.yaml
+
+  # ── 5. Relatórios ─────────────────────────────────────────
   - title: "Relatórios"
     path: relatorios
     icon: mdi:chart-bar
     cards: !include lovelace/views/relatorios.yaml
 
-  # ── 5. Automações ─────────────────────────────────────────
+  # ── 6. Automações ─────────────────────────────────────────
   - title: "Automações"
     path: automacoes
     icon: mdi:robot
     cards: !include lovelace/views/automacoes.yaml
 
-  # ── 6. Segurança ──────────────────────────────────────────
+  # ── 7. Segurança ──────────────────────────────────────────
   - title: "Segurança"
     path: seguranca
     icon: mdi:shield-home
     cards: !include lovelace/views/seguranca.yaml
 
-  # ── 7. Config ─────────────────────────────────────────────
+  # ── 8. Config ─────────────────────────────────────────────
   - title: "Config"
     path: config
     icon: mdi:cog

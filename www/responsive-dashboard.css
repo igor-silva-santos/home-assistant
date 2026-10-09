@@ -1,0 +1,103 @@
+/**
+ * Dashboard responsivo — celular (vertical), tablet (V/H), desktop
+ * Carregado via responsive-dashboard.js
+ */
+
+/* Safe areas (notch / barra de gestos) */
+:root {
+  --ft-safe-top: env(safe-area-inset-top, 0px);
+  --ft-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --ft-safe-left: env(safe-area-inset-left, 0px);
+  --ft-safe-right: env(safe-area-inset-right, 0px);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+/* View principal */
+#view {
+  padding-left: max(8px, var(--ft-safe-left)) !important;
+  padding-right: max(8px, var(--ft-safe-right)) !important;
+  padding-bottom: max(12px, var(--ft-safe-bottom)) !important;
+}
+
+/* Celular — portrait */
+@media (max-width: 599px) {
+  hui-view {
+    --column-count: 1 !important;
+  }
+
+  hui-horizontal-stack {
+    flex-direction: column !important;
+  }
+
+  hui-horizontal-stack > * {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  hui-grid {
+    --grid-columns: 1 !important;
+  }
+
+  ha-card {
+    margin: 4px 0 !important;
+  }
+
+  /* Sidebar como drawer — mais área útil no celular */
+  app-drawer-layout.app-drawer-layout-narrow ha-drawer {
+    --mdc-drawer-width: min(88vw, 300px);
+  }
+}
+
+/* Tablet portrait */
+@media (min-width: 600px) and (max-width: 899px) {
+  hui-grid {
+    --grid-columns: 2 !important;
+  }
+
+  hui-horizontal-stack {
+    flex-wrap: wrap !important;
+  }
+
+  hui-horizontal-stack > * {
+    flex: 1 1 calc(50% - 8px) !important;
+    min-width: 240px !important;
+  }
+}
+
+/* Tablet landscape + desktop pequeno */
+@media (min-width: 900px) and (max-width: 1199px) {
+  hui-grid {
+    --grid-columns: 2 !important;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1200px) {
+  #view {
+    max-width: 1600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Modo kiosk / tablet de parede */
+body.ft-kiosk-mode #view {
+  padding-top: var(--ft-safe-top);
+}
+
+body.ft-kiosk-mode ha-sidebar {
+  display: none;
+}
+
+/* Touch targets maiores */
+@media (pointer: coarse) {
+  mwc-button,
+  ha-card button,
+  mushroom-shape-icon {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

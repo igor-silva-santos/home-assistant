@@ -316,3 +316,243 @@
         title: "🏠 Modo Ausente Ativado"
         message: "Casa protegida. Alarme ativo. Todos os dispositivos desligados."
   mode: single
+
+# ══════════════════════════════════════════════════════════════
+#  📡 CANAL DE LOGS — Offline & acionamentos
+# ══════════════════════════════════════════════════════════════
+
+- id: log_dispositivo_offline
+  alias: "Logs — Dispositivo ficou offline"
+  description: "Notifica e envia evento ao J.A.R.V.I.S quando entidade crítica cai"
+  trigger:
+    - platform: state
+      entity_id:
+        - switch.tv_sala
+        - switch.computador
+        - switch.ar_condicionado_quarto
+        - light.sala_principal
+        - binary_sensor.huawei_node_principal
+      to:
+        - unavailable
+        - unknown
+  action:
+    - service: input_text.set_value
+      target:
+        entity_id: input_text.jarvis_ultimo_evento
+      data:
+        value: >
+          OFFLINE: {{ trigger.to_state.attributes.friendly_name | default(trigger.entity_id) }}
+          há {{ trigger.to_state.last_changed | as_timestamp | timestamp_custom('%H:%M') }}
+    - service: script.jarvis_publicar_evento
+      data:
+        tipo: device_offline
+        entity_id: "{{ trigger.entity_id }}"
+        mensagem: "Dispositivo offline — {{ trigger.entity_id }}"
+    - service: notify.notify
+      data:
+        title: "📡 Dispositivo offline"
+        message: >
+          {{ trigger.to_state.attributes.friendly_name | default(trigger.entity_id) }}
+          ficou indisponível.
+        data:
+          channel: logs
+          importance: high
+  mode: queued
+
+- id: log_dispositivo_online
+  alias: "Logs — Dispositivo voltou online"
+  trigger:
+    - platform: state
+      entity_id:
+        - switch.tv_sala
+        - switch.computador
+        - switch.ar_condicionado_quarto
+        - light.sala_principal
+        - binary_sensor.huawei_node_principal
+      from:
+        - unavailable
+        - unknown
+  action:
+    - service: script.jarvis_publicar_evento
+      data:
+        tipo: device_online
+        entity_id: "{{ trigger.entity_id }}"
+        mensagem: "Dispositivo voltou — {{ trigger.entity_id }}"
+    - service: input_text.set_value
+      target:
+        entity_id: input_text.jarvis_ultimo_evento
+      data:
+        value: "ONLINE: {{ trigger.entity_id }}"
+  mode: queued
+
+- id: log_dispositivo_acionado
+  alias: "Logs — Registrar acionamento (ligar/desligar)"
+  trigger:
+    - platform: state
+      entity_id:
+        - switch.tv_sala
+        - switch.computador
+        - switch.ar_condicionado_quarto
+        - light.sala_principal
+        - light.cozinha
+        - lock.porteira
+  action:
+    - service: script.jarvis_publicar_evento
+      data:
+        tipo: device_state_change
+        entity_id: "{{ trigger.entity_id }}"
+        mensagem: "{{ trigger.entity_id }} → {{ trigger.to_state.state }}"
+  mode: queued
+  max: 20
+
+# ══════════════════════════════════════════════════════════════
+#  📹 FRIGATE — Movimento por zona → alertas
+# ══════════════════════════════════════════════════════════════
+
+- id: alerta_movimento_zona_entrada
+  alias: "Segurança — Movimento zona entrada"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.frigate_camera_01_entrada_portao
+      to: "on"
+  condition:
+    - condition: state
+      entity_id: input_boolean.jarvis_modo_vigilancia
+      state: "on"
+  action:
+    - service: notify.notify
+      data:
+        title: "⚠️ Movimento — Entrada"
+        message: "Pessoa/objeto na zona do portão."
+        data:
+          image: /api/camera_proxy/camera.camera_01
+          channel: seguranca
+          importance: high
+    - service: script.jarvis_publicar_evento
+      data:
+        tipo: motion_zone
+        entity_id: binary_sensor.frigate_camera_01_entrada_portao
+        mensagem: "Movimento na zona entrada_portao"
+  mode: single
+
+- id: alerta_movimento_zona_quintal
+  alias: "Segurança — Movimento zona quintal"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.frigate_camera_02_quintal_lateral
+      to: "on"
+  condition:
+    - condition: state
+      entity_id: input_boolean.jarvis_modo_vigilancia
+      state: "on"
+  action:
+    - service: notify.notify
+      data:
+        title: "⚠️ Movimento — Quintal"
+        message: "Atividade detectada no quintal."
+        data:
+          channel: seguranca
+    - service: script.jarvis_publicar_evento
+      data:
+        tipo: motion_zone
+        entity_id: binary_sensor.frigate_camera_02_quintal_lateral
+        mensagem: "Movimento na zona quintal_lateral"
+  mode: single
+
+- id: alerta_movimento_alarme_ativo
+  alias: "Segurança — Movimento com alarme ligado"
+  trigger:
+    - platform: state
+      entity_id:
+        - binary_sensor.frigate_camera_01_motion
+        - binary_sensor.frigate_camera_02_motion
+        - binary_sensor.frigate_camera_03_motion
+      to: "on"
+  condition:
+    - condition: state
+      entity_id: input_boolean.alarme_ativo
+      state: "on"
+  action:
+    - service: notify.notify
+      data:
+        title: "🚨 Alarme — Movimento"
+        message: "Movimento com alarme ativo em {{ trigger.entity_id }}"
+        data:
+          importance: max
+          channel: alarme
+    - service: script.jarvis_publicar_evento
+      data:
+        tipo: intrusion_alert
+        entity_id: "{{ trigger.entity_id }}"
+        mensagem: "Movimento com alarme ativo"
+  mode: single
+
+# ══════════════════════════════════════════════════════════════
+#  🤖 J.A.R.V.I.S — Webhooks
+# ══════════════════════════════════════════════════════════════
+
+- id: jarvis_webhook_comando
+  alias: "J.A.R.V.I.S — Processar webhook comando"
+  trigger:
+    - platform: webhook
+      webhook_id: jarvis_comando
+      local_only: false
+  action:
+    - variables:
+        payload: "{{ trigger.json }}"
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ payload.action is defined and payload.entity_id is defined }}"
+          sequence:
+            - service: script.jarvis_executar_servico
+              data:
+                domain: "{{ payload.entity_id.split('.')[0] }}"
+                service: "{{ payload.action }}"
+                entity_id: "{{ payload.entity_id }}"
+                data: "{{ payload.data | default({}) }}"
+        - conditions:
+            - condition: template
+              value_template: "{{ payload.script is defined }}"
+          sequence:
+            - service: "script.{{ payload.script }}"
+              data: "{{ payload.data | default({}) }}"
+    - service: input_text.set_value
+      target:
+        entity_id: input_text.jarvis_ultimo_evento
+      data:
+        value: "Webhook JARVIS {{ now().strftime('%H:%M:%S') }}"
+  mode: queued
+
+- id: jarvis_webhook_interfone
+  alias: "J.A.R.V.I.S — Webhook interfone"
+  trigger:
+    - platform: webhook
+      webhook_id: jarvis_interfone
+      local_only: false
+  action:
+    - service: script.jarvis_atender_interfone
+      data:
+        abrir_porteira: "{{ trigger.json.abrir_porteira | default(false) }}"
+  mode: single
+
+- id: jarvis_campainha_para_ia
+  alias: "J.A.R.V.I.S — Campainha encaminhada à IA"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.campainha
+      to: "on"
+  condition:
+    - condition: state
+      entity_id: input_boolean.jarvis_ativo
+      state: "on"
+  action:
+    - service: script.jarvis_atender_interfone
+      data:
+        abrir_porteira: false
+    - service: script.jarvis_publicar_evento
+      data:
+        tipo: doorbell
+        entity_id: binary_sensor.campainha
+        mensagem: "Campainha — encaminhar análise J.A.R.V.I.S"
+  mode: single

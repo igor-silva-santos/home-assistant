@@ -145,6 +145,33 @@ services:
     restart: unless-stopped
 
   # ── Redis — Cache e pub/sub ───────────────────────────────
+  # ── J.A.R.V.I.S Bridge — eventos HA ↔ Redis ↔ sua IA ───────
+  jarvis-bridge:
+    build:
+      context: ./jarvis-bridge
+      dockerfile: Dockerfile
+    container_name: ha-jarvis-bridge
+    hostname: jarvis-bridge
+    environment:
+      HA_URL: http://homeassistant:8123
+      HA_TOKEN: ${HA_LONG_LIVED_TOKEN:-}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-redis_password}@redis:6379/0
+      JARVIS_REDIS_CHANNEL: jarvis:events
+      PORT: 8090
+    ports:
+      - "8090:8090"
+    depends_on:
+      redis:
+        condition: service_healthy
+      homeassistant:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8090/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
   redis:
     image: redis:7-alpine
     container_name: ha-redis

@@ -1,0 +1,102 @@
+# ══════════════════════════════════════════════════════════════
+#  VIEW: CANAL DE LOGS — Telemetria, offline, energia
+# ══════════════════════════════════════════════════════════════
+
+- type: custom:mushroom-title-card
+  title: "📡 Canal de Logs"
+  subtitle: "Offline, tempo ligado/desligado e consumo por aparelho"
+  card_mod:
+    style: |
+      ha-card { background: transparent !important; border: none !important; }
+
+- type: custom:device-channel-card
+  title: "Telemetria em tempo real"
+  refresh_seconds: 5
+  devices:
+    - entity: switch.tv_sala
+      name: "TV Sala"
+      power_entity: sensor.consumo_tv_sala
+    - entity: switch.computador
+      name: "Computador"
+      power_entity: sensor.consumo_computador
+    - entity: switch.ar_condicionado_quarto
+      name: "Ar Condicionado"
+      power_entity: sensor.consumo_ar_condicionado
+    - entity: light.sala_principal
+      name: "Luz Sala"
+      power_entity: sensor.consumo_luz_sala
+    - entity: light.cozinha
+      name: "Luz Cozinha"
+    - entity: switch.geladeira
+      name: "Geladeira"
+      power_entity: sensor.consumo_geladeira
+    - entity: lock.porteira
+      name: "Porteira"
+    - entity: binary_sensor.huawei_node_principal
+      name: "Nó Mesh Principal"
+
+- type: horizontal-stack
+  cards:
+    - type: custom:mushroom-template-card
+      primary: "{{ states('sensor.jarvis_dispositivos_offline') | default('0') }}"
+      secondary: "Dispositivos offline agora"
+      icon: mdi:lan-disconnect
+      icon_color: red
+    - type: custom:mushroom-template-card
+      primary: "{{ states('sensor.jarvis_tempo_medio_offline') | default('—') }}"
+      secondary: "Tempo médio offline (última queda)"
+      icon: mdi:timer-outline
+      icon_color: orange
+    - type: custom:mushroom-template-card
+      primary: "{{ states('sensor.energia_ligados_hoje_kwh') | default('—') }} kWh"
+      secondary: "Consumo estimado — só ligados"
+      icon: mdi:flash
+      icon_color: cyan
+    - type: custom:mushroom-template-card
+      primary: "{{ states('sensor.energia_repouso_hoje_kwh') | default('—') }} kWh"
+      secondary: "Consumo em standby / desligados"
+      icon: mdi:power-sleep
+      icon_color: purple
+
+- type: custom:mushroom-title-card
+  title: "📋 Histórico — Logbook"
+  subtitle: "Acionamentos, quedas e eventos J.A.R.V.I.S"
+
+- type: logbook
+  hours_to_show: 72
+  entities:
+    - switch.tv_sala
+    - switch.computador
+    - switch.ar_condicionado_quarto
+    - light.sala_principal
+    - light.cozinha
+    - lock.porteira
+    - input_boolean.alerta_campainha
+    - input_text.jarvis_ultimo_evento
+  card_mod:
+    style: |
+      ha-card {
+        max-height: 420px;
+        overflow-y: auto;
+        background: linear-gradient(135deg, #0d1321 0%, #111827 100%) !important;
+        border: 1px solid #1a2744 !important;
+      }
+
+- type: custom:mushroom-title-card
+  title: "⚡ Energia por estado (hoje)"
+  subtitle: "Ligado vs desligado — sensores de potência"
+
+- type: history-graph
+  hours_to_show: 24
+  entities:
+    - entity: sensor.consumo_tv_sala
+      name: TV (W)
+    - entity: sensor.consumo_computador
+      name: PC (W)
+    - entity: sensor.consumo_ar_condicionado
+      name: Ar (W)
+  card_mod:
+    style: |
+      ha-card {
+        background: var(--ft-bg-card, #0d1321) !important;
+      }

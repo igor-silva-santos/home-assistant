@@ -1,0 +1,126 @@
+# Scripts invocáveis pelo J.A.R.V.I.S (REST / webhook / assistente)
+
+jarvis_executar_servico:
+  alias: "J.A.R.V.I.S — Executar serviço"
+  description: "domain, service e entity_id vindos do payload da IA"
+  mode: queued
+  fields:
+    domain:
+      description: Domínio HA (light, switch, lock…)
+      example: light
+    service:
+      description: Nome do serviço (turn_on, unlock…)
+      example: turn_on
+    entity_id:
+      description: Entidade alvo
+      example: light.sala_principal
+    data:
+      description: Objeto JSON extra (opcional)
+  sequence:
+    - service: "{{ domain }}.{{ service }}"
+      target:
+        entity_id: "{{ entity_id }}"
+      data: "{{ data | default({}, true) }}"
+    - service: input_text.set_value
+      target:
+        entity_id: input_text.jarvis_ultimo_evento
+      data:
+        value: >
+          {{ domain }}.{{ service }} → {{ entity_id }} em {{ now().strftime('%H:%M') }}
+
+jarvis_criar_rotina_rapida:
+  alias: "J.A.R.V.I.S — Rotina rápida (cenário)"
+  description: "Ativa um modo da casa ou sequência pré-definida"
+  mode: single
+  fields:
+    modo:
+      description: Normal, Noturno, Ausente, Cinema…
+      example: Noturno
+  sequence:
+    - service: input_select.select_option
+      target:
+        entity_id: input_select.modo_casa
+      data:
+        option: "{{ modo }}"
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ modo == 'Noturno' }}"
+          sequence:
+            - service: automation.trigger
+              target:
+                entity_id: automation.modo_noturno
+        - conditions:
+            - condition: template
+              value_template: "{{ modo == 'Ausente' }}"
+          sequence:
+            - service: automation.trigger
+              target:
+                entity_id: automation.modo_ausente_seguranca
+    - service: input_text.set_value
+      target:
+        entity_id: input_text.jarvis_ultimo_evento
+      data:
+        value: "Rotina {{ modo }} acionada pelo J.A.R.V.I.S"
+
+jarvis_atender_interfone:
+  alias: "J.A.R.V.I.S — Atender interfone"
+  description: "Snapshot da câmera, notificação e opcional abertura"
+  mode: single
+  fields:
+    abrir_porteira:
+      description: "true para destravar após análise"
+      example: false
+  sequence:
+    - service: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.alerta_campainha
+    - service: camera.snapshot
+      target:
+        entity_id: camera.camera_01
+      data:
+        filename: "/config/www/snapshots/interfone_{{ now().strftime('%Y%m%d_%H%M%S') }}.jpg"
+    - service: notify.notify
+      data:
+        title: "J.A.R.V.I.S — Interfone"
+        message: "Visitante na porteira. Análise em andamento."
+        data:
+          image: /api/camera_proxy/camera.camera_01
+    - service: input_text.set_value
+      target:
+        entity_id: input_text.jarvis_ultimo_evento
+      data:
+        value: "Interfone atendido {{ now().strftime('%H:%M') }}"
+    - if:
+        - condition: template
+          value_template: "{{ abrir_porteira | default(false) }}"
+      then:
+        - service: lock.unlock
+          target:
+            entity_id: lock.porteira
+
+jarvis_publicar_evento:
+  alias: "J.A.R.V.I.S — Publicar evento para bridge"
+  mode: queued
+  fields:
+    tipo:
+      example: motion_alert
+    mensagem:
+      example: Movimento na zona entrada
+    entity_id:
+      example: binary_sensor.frigate_camera_01_motion
+  sequence:
+    - variables:
+        tipo: "{{ tipo }}"
+        mensagem: "{{ mensagem }}"
+        entity_id: "{{ entity_id | default('') }}"
+    - service: rest_command.jarvis_notificar
+      data:
+        tipo: "{{ tipo }}"
+        mensagem: "{{ mensagem }}"
+        entity_id: "{{ entity_id }}"
+    - service: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.jarvis_ultima_sincronizacao
+      data:
+        datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"

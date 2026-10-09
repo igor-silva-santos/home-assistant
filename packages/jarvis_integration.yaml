@@ -1,0 +1,143 @@
+# ══════════════════════════════════════════════════════════════
+#  J.A.R.V.I.S — Integração com Home Assistant
+#  Webhooks, fila de eventos, sensores e REST
+# ══════════════════════════════════════════════════════════════
+
+input_boolean:
+  jarvis_ativo:
+    name: "J.A.R.V.I.S Ativo"
+    icon: mdi:robot-happy
+    initial: true
+  jarvis_modo_vigilancia:
+    name: "J.A.R.V.I.S — Vigilância por câmera"
+    icon: mdi:cctv
+    initial: true
+
+input_text:
+  jarvis_ultimo_evento:
+    name: "J.A.R.V.I.S — Último evento"
+    max: 255
+    initial: "Aguardando eventos…"
+  jarvis_fila_comandos:
+    name: "J.A.R.V.I.S — Fila de comandos (JSON)"
+    max: 255
+    initial: "[]"
+  jarvis_zonas_alerta:
+    name: "J.A.R.V.I.S — Zonas com alerta"
+    max: 255
+    initial: "entrada,quintal,garagem"
+
+input_datetime:
+  jarvis_ultima_sincronizacao:
+    name: "J.A.R.V.I.S — Última sincronização"
+    has_date: true
+    has_time: true
+
+# Webhook: POST /api/webhook/jarvis_comando
+# Corpo JSON: { "action": "turn_on", "entity_id": "light.sala", "source": "jarvis" }
+webhook:
+  jarvis_comando:
+    name: "J.A.R.V.I.S — Comando"
+    allowed_methods:
+      - POST
+  jarvis_interfone:
+    name: "J.A.R.V.I.S — Interfone"
+    allowed_methods:
+      - POST
+
+rest_command:
+  jarvis_notificar:
+    url: "{{ states('sensor.jarvis_bridge_url') | default('http://jarvis-bridge:8090/events', true) }}"
+    method: POST
+    content_type: "application/json"
+    payload: >
+      {
+        "type": "{{ tipo }}",
+        "entity_id": "{{ entity_id | default('') }}",
+        "message": "{{ mensagem }}",
+        "timestamp": "{{ now().isoformat() }}"
+      }
+
+template:
+  - trigger:
+      - platform: time_pattern
+        minutes: "/1"
+      - platform: homeassistant
+        event: start
+    sensor:
+      - name: "jarvis_dispositivos_offline"
+        unique_id: jarvis_dispositivos_offline
+        state: >
+          {% set monitored = [
+            'switch.tv_sala', 'switch.computador', 'switch.ar_condicionado_quarto',
+            'light.sala_principal', 'binary_sensor.huawei_node_principal'
+          ] %}
+          {{ monitored | map('states') | select('in', ['unavailable', 'unknown']) | list | count }}
+        icon: mdi:lan-disconnect
+
+      - name: "jarvis_bridge_url"
+        unique_id: jarvis_bridge_url
+        state: "http://jarvis-bridge:8090/events"
+
+  - sensor:
+      - name: "jarvis_tempo_medio_offline"
+        unique_id: jarvis_tempo_medio_offline
+        state: >
+          {% set ns = namespace(total=0, n=0) %}
+          {% for e in ['switch.tv_sala', 'switch.computador', 'light.sala_principal'] %}
+            {% if states(e) in ['unavailable', 'unknown'] %}
+              {% set ns.n = ns.n + 1 %}
+              {% set ns.total = ns.total + (as_timestamp(now()) - as_timestamp(states[e].last_changed)) %}
+            {% endif %}
+          {% endfor %}
+          {% if ns.n > 0 %}{{ (ns.total / ns.n) | int }}{% else %}0{% endif %}
+        unit_of_measurement: "s"
+        icon: mdi:timer-sand
+
+      - name: "energia_ligados_hoje_kwh"
+        unique_id: energia_ligados_hoje_kwh
+        state: >
+          {% set powers = [
+            ('switch.tv_sala', 'sensor.consumo_tv_sala'),
+            ('switch.computador', 'sensor.consumo_computador'),
+            ('switch.ar_condicionado_quarto', 'sensor.consumo_ar_condicionado')
+          ] %}
+          {% set total = namespace(w=0.0) %}
+          {% for sw, pw in powers %}
+            {% if is_state(sw, 'on') %}
+              {% set total.w = total.w + (states(pw) | float(0)) %}
+            {% endif %}
+          {% endfor %}
+          {{ (total.w * 0.001) | round(3) }}
+        unit_of_measurement: "kWh"
+        icon: mdi:flash
+
+      - name: "energia_repouso_hoje_kwh"
+        unique_id: energia_repouso_hoje_kwh
+        state: >
+          {% set powers = [
+            ('switch.tv_sala', 'sensor.consumo_tv_sala', 5),
+            ('switch.computador', 'sensor.consumo_computador', 8),
+            ('switch.geladeira', 'sensor.consumo_geladeira', 80)
+          ] %}
+          {% set total = namespace(w=0.0) %}
+          {% for sw, pw, standby in powers %}
+            {% if not is_state(sw, 'on') %}
+              {% set p = states(pw) | float(standby) %}
+              {% set total.w = total.w + (p if p > 0 else standby) %}
+            {% endif %}
+          {% endfor %}
+          {{ (total.w * 0.001) | round(3) }}
+        unit_of_measurement: "kWh"
+        icon: mdi:power-sleep
+
+      - name: "jarvis_status"
+        unique_id: jarvis_status
+        state: >
+          {% if is_state('input_boolean.jarvis_ativo', 'on') %}online{% else %}standby{% endif %}
+        icon: >
+          {% if is_state('input_boolean.jarvis_ativo', 'on') %}mdi:robot-happy{% else %}mdi:robot-off{% endif %}
+        attributes:
+          ultimo_evento: "{{ states('input_text.jarvis_ultimo_evento') }}"
+          vigilancia: "{{ states('input_boolean.jarvis_modo_vigilancia') }}"
+          zonas: "{{ states('input_text.jarvis_zonas_alerta') }}"
