@@ -1,0 +1,146 @@
+# ══════════════════════════════════════════════════════════════
+#  VIEW: CÔMODOS (AUTO) — entidades por Área do HA
+#  Requer: HACS → auto-entities + áreas configuradas no HA
+#  Ver docs/AREAS.md — nomes de área abaixo devem bater com os seus
+# ══════════════════════════════════════════════════════════════
+
+- type: markdown
+  content: >
+    **Modo automático** — lista dispositivos pela **Área** nativa do Home Assistant.
+    Instale **auto-entities** (HACS) e ajuste os nomes `area:` se suas áreas forem diferentes
+    (Configurações → Áreas). Para controle visual com `room-card`, use a aba **Cômodos**.
+
+- type: custom:mushroom-title-card
+  title: "Sala"
+  subtitle: "auto-entities · area: Sala"
+  card_mod:
+    style: |
+      ha-card { background: transparent !important; border: none !important; }
+
+- type: custom:auto-entities
+  card:
+    type: entities
+    title: Dispositivos
+    show_header_toggle: true
+  filter:
+    include:
+      - area: Sala
+        domain:
+          - light
+          - switch
+          - climate
+          - fan
+          - cover
+          - sensor
+          - binary_sensor
+    exclude:
+      - entity_id: sensor.saudacao
+  sort:
+    method: name
+
+- type: custom:mushroom-title-card
+  title: "Quarto"
+  card_mod:
+    style: |
+      ha-card { background: transparent !important; border: none !important; }
+
+- type: custom:auto-entities
+  card:
+    type: entities
+    show_header_toggle: true
+  filter:
+    include:
+      - area: Quarto
+        domain:
+          - light
+          - switch
+          - climate
+          - sensor
+          - binary_sensor
+  sort:
+    method: name
+
+- type: custom:mushroom-title-card
+  title: "Cozinha"
+  card_mod:
+    style: |
+      ha-card { background: transparent !important; border: none !important; }
+
+- type: custom:auto-entities
+  card:
+    type: entities
+    show_header_toggle: true
+  filter:
+    include:
+      - area: Cozinha
+        domain:
+          - light
+          - switch
+          - sensor
+          - binary_sensor
+  sort:
+    method: name
+
+- type: custom:mushroom-title-card
+  title: "Banheiro"
+  card_mod:
+    style: |
+      ha-card { background: transparent !important; border: none !important; }
+
+- type: custom:auto-entities
+  card:
+    type: entities
+    show_header_toggle: true
+  filter:
+    include:
+      - area: Banheiro
+        domain:
+          - light
+          - switch
+          - sensor
+          - binary_sensor
+  sort:
+    method: name
+
+- type: custom:mushroom-title-card
+  title: "Escritório"
+  card_mod:
+    style: |
+      ha-card { background: transparent !important; border: none !important; }
+
+- type: custom:auto-entities
+  card:
+    type: entities
+    show_header_toggle: true
+  filter:
+    include:
+      - area: Escritório
+        domain:
+          - light
+          - switch
+          - climate
+          - sensor
+          - binary_sensor
+  sort:
+    method: name
+
+- type: custom:mushroom-title-card
+  title: "Área externa"
+  card_mod:
+    style: |
+      ha-card { background: transparent !important; border: none !important; }
+
+- type: custom:auto-entities
+  card:
+    type: entities
+    show_header_toggle: true
+  filter:
+    include:
+      - area: "Área externa"
+        domain:
+          - light
+          - switch
+          - sensor
+          - binary_sensor
+  sort:
+    method: name

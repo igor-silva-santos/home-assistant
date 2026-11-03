@@ -55,6 +55,7 @@ No HA → HACS → Frontend → buscar e instalar:
 | **Card Mod** | CSS customizado nos cards |
 | **Mini Graph Card** | Sparklines (minigráficos) |
 | **Tabbed Card** | Abas dentro de cards |
+| **Auto Entities** | Aba **Por área** (`comodos-auto.yaml`) |
 | **Frigate Card** | Viewer para câmeras Frigate |
 
 Após instalar cada um, adicione ao `configuration.yaml` → `lovelace.resources` (já feito no arquivo do projeto).
