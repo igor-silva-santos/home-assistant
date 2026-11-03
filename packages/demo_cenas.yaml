@@ -1,0 +1,72 @@
+# ══════════════════════════════════════════════════════════════
+#  Cenas estilo publicação (Brilho, Aconchego, Filme, Noite)
+#  Requer pacote demo_casa ou entidades reais equivalentes
+# ══════════════════════════════════════════════════════════════
+
+scene:
+  - name: Brilho
+    id: brilho
+    icon: mdi:brightness-7
+    entities:
+      light.sala_principal:
+        state: on
+        brightness: 255
+      light.sala_abajur:
+        state: on
+        brightness: 255
+      light.quarto_principal:
+        state: on
+        brightness: 255
+      light.cozinha:
+        state: on
+        brightness: 255
+
+  - name: Aconchego
+    id: aconchego
+    icon: mdi:sofa
+    entities:
+      light.sala_principal:
+        state: on
+        brightness: 120
+        color_temp: 454
+      light.sala_abajur:
+        state: on
+        brightness: 80
+        color_temp: 454
+      light.quarto_principal:
+        state: on
+        brightness: 60
+        color_temp: 454
+      switch.tv_sala:
+        state: off
+
+  - name: Filme
+    id: filme
+    icon: mdi:movie-open
+    entities:
+      light.sala_principal:
+        state: on
+        brightness: 40
+      light.sala_abajur:
+        state: off
+      switch.tv_sala:
+        state: on
+      switch.som_sala:
+        state: on
+
+  - name: Noite
+    id: noite
+    icon: mdi:weather-night
+    entities:
+      light.sala_principal:
+        state: off
+      light.sala_abajur:
+        state: off
+      light.quarto_principal:
+        state: on
+        brightness: 30
+      light.cozinha:
+        state: off
+      light.area_externa:
+        state: on
+        brightness: 50

@@ -1,0 +1,19 @@
+# ══════════════════════════════════════════════════════════════
+#  VIEW: KIOSK — Tablet de parede (leve + 3D fullscreen)
+# ══════════════════════════════════════════════════════════════
+
+- type: custom:nextfloor-card
+  fill: true
+  theme: neon
+  accent: "#00d4ff"
+  quality: low
+  idle_return: 120
+  night: sun
+  central_open: true
+  room_panel: true
+  scenes: true
+  alerts: true
+  energy: false
+  holograms: false
+  flows: false
+  stats: false

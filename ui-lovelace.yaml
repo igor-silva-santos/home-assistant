@@ -29,39 +29,52 @@ views:
       grid-template-rows: auto
     cards: !include lovelace/views/home.yaml
 
-  # ── 2. Cômodos ────────────────────────────────────────────
+  # ── 2. Planta 3D ──────────────────────────────────────────
+  - title: "Planta 3D"
+    path: planta3d
+    icon: mdi:home-floor-3
+    cards: !include lovelace/views/planta3d.yaml
+
+  # ── 3. Cômodos ────────────────────────────────────────────
   - title: "Cômodos"
     path: comodos
     icon: mdi:floor-plan
     cards: !include lovelace/views/comodos.yaml
 
-  # ── 3. Energia ────────────────────────────────────────────
+  # ── 4. Energia ────────────────────────────────────────────
   - title: "Energia"
     path: energia
     icon: mdi:lightning-bolt
     panel: false
     cards: !include lovelace/views/energia.yaml
 
-  # ── 4. Relatórios ─────────────────────────────────────────
+  # ── 5. Relatórios ─────────────────────────────────────────
   - title: "Relatórios"
     path: relatorios
     icon: mdi:chart-bar
     cards: !include lovelace/views/relatorios.yaml
 
-  # ── 5. Automações ─────────────────────────────────────────
+  # ── 6. Automações ─────────────────────────────────────────
   - title: "Automações"
     path: automacoes
     icon: mdi:robot
     cards: !include lovelace/views/automacoes.yaml
 
-  # ── 6. Segurança ──────────────────────────────────────────
+  # ── 7. Segurança ──────────────────────────────────────────
   - title: "Segurança"
     path: seguranca
     icon: mdi:shield-home
     cards: !include lovelace/views/seguranca.yaml
 
-  # ── 7. Config ─────────────────────────────────────────────
+  # ── 8. Config ─────────────────────────────────────────────
   - title: "Config"
     path: config
     icon: mdi:cog
     cards: !include lovelace/views/config.yaml
+
+  # ── 9. Kiosk (tablet de parede) ───────────────────────────
+  - title: "Kiosk"
+    path: kiosk
+    icon: mdi:tablet-dashboard
+    panel: true
+    cards: !include lovelace/views/kiosk.yaml
