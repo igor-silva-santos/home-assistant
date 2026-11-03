@@ -1,0 +1,40 @@
+# frigate/config.example.yml
+# Copie para frigate/config.yml (pasta gitignored) e ajuste RTSP
+
+mqtt:
+  enabled: false
+  # host: core-mosquitto
+  # user: mqtt
+  # password: !secret mqtt_password
+
+detectors:
+  cpu1:
+    type: cpu
+
+cameras:
+  camera_01:
+    enabled: true
+    ffmpeg:
+      inputs:
+        - path: rtsp://USER:PASS@192.168.1.101:554/stream1
+          roles:
+            - detect
+            - record
+    detect:
+      width: 1280
+      height: 720
+      fps: 5
+    objects:
+      track:
+        - person
+        - car
+
+record:
+  enabled: true
+  retain:
+    days: 7
+
+detect:
+  enabled: true
+
+version: 0.14
