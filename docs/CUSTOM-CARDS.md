@@ -151,7 +151,9 @@ entities:
 | `name` | string | "Cômodo" | Nome do ambiente |
 | `room` | string | "room" | ID interno (para referência) |
 | `icon` | string | mdi:home | Ícone MDI do cômodo |
-| `navigate_to` | string | null | URL para navegar ao tocar no cabeçalho |
+| `navigate_to` | string | null | URL ao tocar no cabeçalho |
+| `navigate_to_3d` | string | null | Botão **3D** no cabeçalho (ex.: `/lovelace/planta3d`) |
+| `nextfloor_room` | string | null | ID do cômodo no editor NextFloor (sessionStorage) |
 | `entities` | list | [] | Lista de entidades do cômodo |
 
 ### Configuração de entidade
