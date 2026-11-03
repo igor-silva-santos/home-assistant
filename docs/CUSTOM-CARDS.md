@@ -161,7 +161,8 @@ entities:
   - entity: light.minha_luz       # entity_id obrigatório
     name: "Minha Luz"             # nome exibido
     icon: mdi:ceiling-light       # ícone personalizado
-    show_brightness: true         # mostra slider de brilho (lights)
+    show_brightness: true         # slider de brilho (lights)
+    show_temperature: true        # slider alvo °C (climate)
     show_power: true              # mostra consumo em watts
     type: sensor                  # forçar como sensor (não togglável)
 ```
@@ -169,6 +170,7 @@ entities:
 ### Comportamento visual
 
 - Dispositivo LIGADO: fundo ciano, ícone com glow pulsante
+- **Climate:** toque liga/desliga (hvac); slider ajusta temperatura alvo
 - Dispositivo DESLIGADO: fundo cinza escuro
 - Toggle master: liga/desliga todos os dispositivos controláveis do cômodo
 - Card brilha com glow ciano quando há dispositivos ligados

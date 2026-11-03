@@ -69,6 +69,27 @@ Com `homeassistant.packages` ativo, estas entidades existem via templates:
 | input_boolean.modo_noturno | configuration.yaml | Automações |
 | input_select.modo_casa | configuration.yaml | Modos |
 | input_number.tarifa_kwh | configuration.yaml | Energia |
+| climate.ar_condicionado_quarto | demo_casa (template) | Cômodos → slider °C |
+
+## Minhas entidades (produção)
+
+Preencha com os IDs reais da sua instância (Developer Tools → Estados).  
+Depois renomeie entidades no HA **ou** edite os arquivos YAML indicados.
+
+| Uso no dashboard | entity_id real (preencher) | Onde editar se não renomear |
+|------------------|----------------------------|-----------------------------|
+| Luz sala | `light.________________` | `lovelace/views/comodos.yaml`, `home.yaml` |
+| Luz abajur | `light.________________` | idem |
+| AC quarto | `climate.________________` | `comodos.yaml` (show_temperature) |
+| TV sala | `switch.________________` | idem |
+| Porteira | `lock.________________` | `home.yaml`, `seguranca.yaml` |
+| Campainha | `binary_sensor.________________` | `automations.yaml` |
+| Clima (meteo) | `weather.________________` | `home.yaml` weather-forecast |
+| Calendário | `calendar.________________` | `home.yaml` calendar-card |
+
+Template pronto para copiar: [`packages/producao.yaml.example`](../packages/producao.yaml.example).
+
+Checklist completo: [`DEPLOY-CHECKLIST.md`](./DEPLOY-CHECKLIST.md).
 
 ## Substituir por hardware real (exemplos)
 
@@ -76,6 +97,7 @@ Com `homeassistant.packages` ativo, estas entidades existem via templates:
 |---------------------|-------------------|------|
 | light.sala_principal | Tuya / Hue / ESPHome | Renomear entidade real para este ID **ou** editar YAML |
 | switch.tv_sala | Broadlink / Harmony / smart plug | idem |
+| climate.ar_condicionado_quarto | Tuya / ESPHome / Daikin | idem |
 | lock.porteira | Shelly / Tuya lock | idem |
 | binary_sensor.campainha | Zigbee / Shelly i4 | idem |
 | weather.home | Met.no / OpenWeatherMap | Ajustar `entity` em home.yaml |

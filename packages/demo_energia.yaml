@@ -36,7 +36,7 @@ template:
       - name: "Consumo Ar Condicionado"
         unique_id: demo_consumo_ar
         unit_of_measurement: "kWh"
-        state: "{{ 1.8 if is_state('switch.ar_condicionado_quarto','on') else 0.2 }}"
+        state: "{{ 1.8 if states('climate.ar_condicionado_quarto') not in ['off', 'unavailable', 'unknown'] else 0.2 }}"
       - name: "Consumo Geladeira"
         unique_id: demo_consumo_geladeira
         unit_of_measurement: "kWh"
@@ -96,7 +96,7 @@ template:
       - name: "Horas Ligado Ar Condicionado"
         unique_id: demo_horas_ar
         unit_of_measurement: "h"
-        state: "{{ 4 if is_state('switch.ar_condicionado_quarto','on') else 1 }}"
+        state: "{{ 4 if states('climate.ar_condicionado_quarto') not in ['off', 'unavailable', 'unknown'] else 1 }}"
       - name: "Horas Ligado Computador"
         unique_id: demo_horas_pc
         unit_of_measurement: "h"
@@ -119,7 +119,7 @@ template:
         state: "{{ is_state('switch.computador', 'on') }}"
       - name: "Ar Condicionado Ligado"
         unique_id: demo_bin_ar
-        state: "{{ is_state('switch.ar_condicionado_quarto', 'on') }}"
+        state: "{{ states('climate.ar_condicionado_quarto') not in ['off', 'unavailable', 'unknown'] }}"
       - name: "Luz Cozinha Sem Movimento"
         unique_id: demo_luz_coz_sem_mov
         state: "{{ is_state('light.cozinha','on') }}"

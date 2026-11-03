@@ -118,4 +118,4 @@ O projeto [house-control-android](https://github.com/0xProbabillity/house-contro
 
 ---
 
-Próximo passo recomendado no servidor: **HACS + NextFloor + reinício**, depois desenhar um cômodo e vincular `light.sala_principal` como prova de ponta a ponta.
+Próximo passo recomendado no servidor: **HACS + NextFloor + reinício**, depois [`DEPLOY-CHECKLIST.md`](./DEPLOY-CHECKLIST.md).

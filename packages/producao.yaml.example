@@ -1,0 +1,52 @@
+# ══════════════════════════════════════════════════════════════
+#  EXEMPLO — Pacote produção (NÃO ativo por padrão)
+# ══════════════════════════════════════════════════════════════
+#
+# Como usar:
+# 1. Copie para packages/producao.yaml
+# 2. Preencha os entity_id reais abaixo (ou use Renomear entidade no HA)
+# 3. Comente/remova homeassistant.packages demo OU exclua demo_*.yaml
+# 4. Reinicie o Home Assistant
+#
+# Este arquivo NÃO é carregado enquanto terminar em .example
+# ══════════════════════════════════════════════════════════════
+
+# Descomente e adapte — merge com packages existentes:
+#
+# homeassistant:
+#   customize:
+#     light.SEU_ID_TUYA_SALA:
+#       friendly_name: "Sala Principal"
+#
+# template:
+#   - sensor:
+#       - name: "temperatura_sala"
+#         state: "{{ states('sensor.seu_sensor_temp_sala') }}"
+
+# ── Mapeamento sugerido (placeholder → real) ─────────────────
+#
+# | Lovelace (dashboard)     | Cole aqui o entity_id real        |
+# |--------------------------|-----------------------------------|
+# | light.sala_principal     | light.___________________________ |
+# | light.sala_abajur        | light.___________________________ |
+# | light.quarto_principal   | light.___________________________ |
+# | climate.ar_condicionado_quarto | climate.__________________ |
+# | switch.tv_sala           | switch.__________________________ |
+# | lock.porteira            | lock.____________________________ |
+# | binary_sensor.campainha  | binary_sensor.___________________ |
+# | weather.home             | weather._________________________ |
+# | calendar.home            | calendar.________________________ |
+#
+# Atalho: preencha a tabela em docs/ENTITY-MAP.md → seção
+# "Minhas entidades (produção)" e edite os YAMLs listados lá.
+
+# Exemplo de alias via customize (legado) — prefira Renomear ID no HA:
+# homeassistant:
+#   customize:
+#     light.tuya_abc123:
+#       friendly_name: Sala Principal
+
+# Integrações comuns:
+# - Smart Life → Home Assistant Tuya (nuvem ou LocalTuya)
+# - Philips Hue → integração Hue nativa
+# - AC inverter → climate.* via ESPHome / Tuya / Broadlink

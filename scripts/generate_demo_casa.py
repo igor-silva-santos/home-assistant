@@ -94,10 +94,21 @@ def main() -> None:
                 "    min: 0",
                 "    max: 100",
                 "    step: 1",
-                "    initial: 70",
-                '    unit_of_measurement: "%"',
+        "    initial: 70",
+        '    unit_of_measurement: "%"',
             ]
         )
+    lines.extend(
+        [
+            "  demo_ac_target_ar_condicionado_quarto:",
+            '    name: "Demo AC alvo quarto"',
+            "    min: 16",
+            "    max: 30",
+            "    step: 1",
+            "    initial: 23",
+            '    unit_of_measurement: "°C"',
+        ]
+    )
 
     lines.extend(["", "template:", "  - light:"])
     for slug in LIGHTS:
@@ -145,6 +156,48 @@ def main() -> None:
                 f"              entity_id: input_boolean.{ib}",
             ]
         )
+
+    lines.extend(
+        [
+            "",
+            "  - climate:",
+            '      - name: "Ar Condicionado Quarto"',
+            "        unique_id: demo_climate_ar_condicionado_quarto",
+            "        hvac_modes:",
+            '          - "off"',
+            '          - "cool"',
+            '          - "heat"',
+            "        min_temp: 16",
+            "        max_temp: 30",
+            "        temperature_unit: celsius",
+            "        current_temperature: \"{{ states('sensor.temperatura_quarto') | float(22) }}\"",
+            "        target_temperature: \"{{ states('input_number.demo_ac_target_ar_condicionado_quarto') | float(23) }}\"",
+            "        hvac_mode: >",
+            "          {% if is_state('input_boolean.demo_sw_ar_condicionado_quarto', 'on') %}cool{% else %}off{% endif %}",
+            "        set_temperature:",
+            "          - service: input_number.set_value",
+            "            target:",
+            "              entity_id: input_number.demo_ac_target_ar_condicionado_quarto",
+            "            data:",
+            '              value: "{{ temperature }}"',
+            "        set_hvac_mode:",
+            "          - choose:",
+            "              - conditions:",
+            "                  - condition: template",
+            '                    value_template: "{{ hvac_mode == ''off'' }}"',
+            "                sequence:",
+            "                  - service: input_boolean.turn_off",
+            "                    target:",
+            "                      entity_id: input_boolean.demo_sw_ar_condicionado_quarto",
+            "              - conditions:",
+            "                  - condition: template",
+            '                    value_template: "{{ hvac_mode != ''off'' }}"',
+            "                sequence:",
+            "                  - service: input_boolean.turn_on",
+            "                    target:",
+            "                      entity_id: input_boolean.demo_sw_ar_condicionado_quarto",
+        ]
+    )
 
     lines.extend(
         [
