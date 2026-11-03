@@ -1,0 +1,13 @@
+# ══════════════════════════════════════════════════════════════
+#  Integração Frigate no Home Assistant
+#  Copie para configuration.yaml quando Frigate estiver no ar
+# ══════════════════════════════════════════════════════════════
+
+# frigate:
+#   host: frigate
+#   port: 5000
+#   # url: http://frigate:5000   # alternativa explícita
+
+# Opcional — card HACS Frigate Card em lovelace.resources:
+# - url: /hacsfiles/frigate/frigate.js
+#   type: module
