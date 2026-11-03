@@ -212,6 +212,7 @@ http:
 # secrets.yaml (NÃO committar no git):
 # db_url: "postgresql://hauser:SENHA@localhost/homeassistant"
 # influx_token: "seu-token-influxdb"
+# (Ativar Influx: docs/INFLUX-GRAFANA.md + config-examples/influx-ha.yaml)
 # google_client_id: "seu-client-id"
 # google_client_secret: "seu-client-secret"
 # orbe_api_key: "sua-api-key-orbe"

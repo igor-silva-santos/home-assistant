@@ -1,0 +1,14 @@
+apiVersion: 1
+
+datasources:
+  - name: InfluxDB Home Assistant
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    isDefault: true
+    jsonData:
+      version: Flux
+      organization: homeassistant
+      defaultBucket: ha_metrics
+    secureJsonData:
+      token: REPLACE_WITH_INFLUX_TOKEN
