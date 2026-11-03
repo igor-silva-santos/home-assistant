@@ -40,7 +40,7 @@ Detalhes: [`docs/SETUP.md`](./docs/SETUP.md) · [`docs/CONNECT-HA-3D.md`](./docs
 - [x] Cenas na Home + `room-card` com climate
 - [x] Template `producao.yaml.example` + checklist deploy
 - [ ] Aceleração Coral TPU no Frigate
-- [ ] Energy Dashboard nativo
+- [ ] Energy Dashboard nativo — [`docs/ENERGY-DASHBOARD.md`](./docs/ENERGY-DASHBOARD.md)
 - [ ] Mais dispositivos Matter
 - [ ] Modo kiosk para tablet de parede
 
