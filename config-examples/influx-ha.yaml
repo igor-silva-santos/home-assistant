@@ -1,0 +1,19 @@
+# ══════════════════════════════════════════════════════════════
+#  Trecho para configuration.yaml — integração InfluxDB 2.x
+#  Token em secrets.yaml: influx_token: "..."
+# ══════════════════════════════════════════════════════════════
+
+# influxdb:
+#   api_version: 2
+#   host: influxdb          # ou localhost se HA fora do compose
+#   port: 8086
+#   token: !secret influx_token
+#   organization: homeassistant
+#   bucket: ha_metrics
+#   include:
+#     entity_globs:
+#       - sensor.consumo_*
+#       - sensor.temperatura_*
+#       - sensor.umidade_*
+#       - sensor.custo_*
+#       - binary_sensor.frigate_*

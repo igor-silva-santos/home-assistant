@@ -15,6 +15,8 @@ COPY ./themes       /config/themes
 COPY ./www          /config/www
 COPY ./lovelace     /config/lovelace
 COPY ./packages     /config/packages
+COPY ./config-examples /config/config-examples
+COPY ./grafana      /config/grafana
 COPY ./docs         /config/docs
 
 # Arquivos de configuração principais
