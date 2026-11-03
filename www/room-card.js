@@ -21,6 +21,7 @@
  *   navigate_to: /lovelace/comodos
  *   navigate_to_3d: /lovelace/planta3d
  *   nextfloor_room: room_abc123   # opcional — ID do editor NextFloor
+ */
 
 class RoomCard extends HTMLElement {
   constructor() {
