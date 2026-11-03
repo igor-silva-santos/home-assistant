@@ -105,7 +105,7 @@ Compare com [`ENTITY-MAP.md`](./ENTITY-MAP.md).
 
 ## App Android estilo publicação (opcional)
 
-O projeto [house-control-android](https://github.com/0xProbabillity/house-control-android) é **app separado** que também consome HA via token. Pode conviver com este dashboard; não substitui os custom cards do repo.
+Detalhes no repositório: [`HOUSE-CONTROL-ANDROID.md`](./HOUSE-CONTROL-ANDROID.md).
 
 ## Troubleshooting
 

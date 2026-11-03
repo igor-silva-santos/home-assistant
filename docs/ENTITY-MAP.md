@@ -100,6 +100,7 @@ Checklist completo: [`DEPLOY-CHECKLIST.md`](./DEPLOY-CHECKLIST.md).
 | climate.ar_condicionado_quarto | Tuya / ESPHome / Daikin | idem |
 | lock.porteira | Shelly / Tuya lock | idem |
 | binary_sensor.campainha | Zigbee / Shelly i4 | idem |
+| App 3D Android | House Control + token HA | [`HOUSE-CONTROL-ANDROID.md`](./HOUSE-CONTROL-ANDROID.md) |
 | weather.home | Met.no / OpenWeatherMap | Ajustar `entity` em home.yaml |
 | calendar.home | Google / Local Calendar | Configurar integração |
 | media_player.echo_sala | Alexa Media Player (HACS) | Opcional |
