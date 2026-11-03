@@ -29,7 +29,7 @@ Descomente entradas em `configuration.yaml` → `lovelace.resources` após insta
 - [ ] **Home** → botões **Brilho / Filme** alteram luzes
 - [ ] **Cômodos** → `light.sala_principal` liga/desliga no room-card
 - [ ] **Cômodos** → **Quarto** → slider do **Ar Condicionado** (climate) muda alvo °C
-- [ ] **Planta 3D** → card NextFloor carrega (não “custom element missing”)
+- [ ] **Relatórios** → toggles demo alteram Mbps / mesh
 - [ ] **Planta 3D** → `Simular campainha` acende alerta na Home
 
 ## Validação automática

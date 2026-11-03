@@ -64,6 +64,9 @@ Com `homeassistant.packages` ativo, estas entidades existem via templates:
 | scene.acconchego | demo_cenas | idem |
 | scene.filme | demo_cenas | idem |
 | scene.noite | demo_cenas | idem |
+| sensor.frigate_detections_today | demo_seguranca | Segurança (PR #3) |
+| sensor.huawei_download_speed | demo_relatorios | Relatórios → Rede |
+| sensor.huawei_connected_devices | demo_relatorios | idem |
 | input_boolean.alerta_campainha | configuration.yaml | Alerta home |
 | input_boolean.alarme_ativo | configuration.yaml | Segurança |
 | input_boolean.modo_noturno | configuration.yaml | Automações |

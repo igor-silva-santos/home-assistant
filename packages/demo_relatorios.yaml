@@ -1,0 +1,73 @@
+# ══════════════════════════════════════════════════════════════
+#  Pacote demo_relatorios — rede Huawei / mesh simulada
+#  Complementa demo_energia (consumo já coberto)
+# ══════════════════════════════════════════════════════════════
+
+input_boolean:
+  demo_rede_pesada:
+    name: "Demo rede pesada (mais Mbps)"
+  demo_mesh_satelite_off:
+    name: "Demo satelite mesh offline"
+
+template:
+  - sensor:
+      - name: "Huawei Download Speed"
+        unique_id: demo_huawei_download
+        unit_of_measurement: "Mbit/s"
+        state: "{{ 420 if is_state('input_boolean.demo_rede_pesada','on') else 185 }}"
+      - name: "Huawei Upload Speed"
+        unique_id: demo_huawei_upload
+        unit_of_measurement: "Mbit/s"
+        state: "{{ 95 if is_state('input_boolean.demo_rede_pesada','on') else 42 }}"
+      - name: "Huawei Connected Devices"
+        unique_id: demo_huawei_devices
+        unit_of_measurement: "devices"
+        state: "{{ 14 if is_state('input_boolean.demo_rede_pesada','on') else 9 }}"
+
+      - name: "Huawei Top1 Device"
+        unique_id: demo_huawei_top1
+        state: "TV Sala — 18%"
+      - name: "Huawei Top2 Device"
+        unique_id: demo_huawei_top2
+        state: "Notebook — 12%"
+      - name: "Huawei Top3 Device"
+        unique_id: demo_huawei_top3
+        state: "Celular Igor — 9%"
+      - name: "Huawei Top4 Device"
+        unique_id: demo_huawei_top4
+        state: "Echo Dot — 6%"
+      - name: "Huawei Top5 Device"
+        unique_id: demo_huawei_top5
+        state: "Smart TV Quarto — 5%"
+
+      - name: "Huawei Node Principal Info"
+        unique_id: demo_huawei_node_main_info
+        state: "Online · 5 GHz"
+        attributes:
+          signal_strength: "-42 dBm"
+      - name: "Huawei Node Satelite 1 Info"
+        unique_id: demo_huawei_node_sat1_info
+        state: >
+          {% if is_state('input_boolean.demo_mesh_satelite_off','on') %}
+          Offline
+          {% else %}
+          Online · backhaul Wi-Fi
+          {% endif %}
+        attributes:
+          signal_strength: >
+            {% if is_state('input_boolean.demo_mesh_satelite_off','on') %}
+            —
+            {% else %}
+            -58 dBm
+            {% endif %}
+
+  - binary_sensor:
+      - name: "Huawei Node Principal"
+        unique_id: demo_huawei_node_main
+        state: "on"
+      - name: "Huawei Node Satelite 1"
+        unique_id: demo_huawei_node_sat1
+        state: "{{ is_state('input_boolean.demo_mesh_satelite_off','off') }}"
+      - name: "Huawei Node Satelite 2"
+        unique_id: demo_huawei_node_sat2
+        state: "on"
