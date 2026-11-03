@@ -1,0 +1,101 @@
+# ══════════════════════════════════════════════════════════════
+#  Pacote demo_seguranca — câmeras e Frigate simulados
+#  Complementa demo_casa (lock.porteira já existe)
+# ══════════════════════════════════════════════════════════════
+
+input_boolean:
+  demo_motion_cam_01:
+    name: "Demo movimento cam 01 entrada"
+  demo_motion_cam_02:
+    name: "Demo movimento cam 02 quintal"
+  demo_motion_cam_03:
+    name: "Demo movimento cam 03 garagem"
+  demo_motion_cam_04:
+    name: "Demo movimento cam 04 sala"
+  demo_frigate_person:
+    name: "Demo detecção pessoa Frigate"
+
+camera:
+  - platform: generic
+    name: "Camera 01"
+    still_image_url: /local/demo/camera-01.svg
+    limit_refetch_to_url_change: true
+  - platform: generic
+    name: "Camera 02"
+    still_image_url: /local/demo/camera-02.svg
+    limit_refetch_to_url_change: true
+  - platform: generic
+    name: "Camera 03"
+    still_image_url: /local/demo/camera-03.svg
+    limit_refetch_to_url_change: true
+  - platform: generic
+    name: "Camera 04"
+    still_image_url: /local/demo/camera-04.svg
+    limit_refetch_to_url_change: true
+  - platform: generic
+    name: "Frigate Camera 01 Person"
+    still_image_url: /local/demo/frigate-snapshot.svg
+    limit_refetch_to_url_change: true
+  - platform: generic
+    name: "Frigate Latest Detection"
+    still_image_url: /local/demo/frigate-snapshot.svg
+    limit_refetch_to_url_change: true
+
+template:
+  - binary_sensor:
+      - name: "Frigate Camera 01 Motion"
+        unique_id: demo_frigate_motion_01
+        device_class: motion
+        state: "{{ is_state('input_boolean.demo_motion_cam_01', 'on') }}"
+      - name: "Frigate Camera 02 Motion"
+        unique_id: demo_frigate_motion_02
+        device_class: motion
+        state: "{{ is_state('input_boolean.demo_motion_cam_02', 'on') }}"
+      - name: "Frigate Camera 03 Motion"
+        unique_id: demo_frigate_motion_03
+        device_class: motion
+        state: "{{ is_state('input_boolean.demo_motion_cam_03', 'on') }}"
+      - name: "Frigate Camera 04 Motion"
+        unique_id: demo_frigate_motion_04
+        device_class: motion
+        state: "{{ is_state('input_boolean.demo_motion_cam_04', 'on') }}"
+      - name: "Frigate Camera 01 Person"
+        unique_id: demo_frigate_person_01
+        device_class: occupancy
+        state: "{{ is_state('input_boolean.demo_frigate_person', 'on') }}"
+
+  - sensor:
+      - name: "Frigate Detections Today"
+        unique_id: demo_frigate_detections_today
+        state: >
+          {{ [
+            is_state('input_boolean.demo_motion_cam_01','on'),
+            is_state('input_boolean.demo_motion_cam_02','on'),
+            is_state('input_boolean.demo_motion_cam_03','on'),
+            is_state('input_boolean.demo_motion_cam_04','on'),
+            is_state('input_boolean.demo_frigate_person','on')
+          ] | select('equalto', true) | list | count * 3 + 2 }}
+      - name: "Frigate Person Count"
+        unique_id: demo_frigate_person_count
+        state: "{{ 1 if is_state('input_boolean.demo_frigate_person','on') else 0 }}"
+      - name: "Frigate Car Count"
+        unique_id: demo_frigate_car_count
+        state: "{{ 1 if is_state('input_boolean.demo_motion_cam_03','on') else 0 }}"
+      - name: "Frigate Animal Count"
+        unique_id: demo_frigate_animal_count
+        state: "{{ 1 if is_state('input_boolean.demo_motion_cam_02','on') else 0 }}"
+
+automation:
+  - id: demo_frigate_person_auto_off
+    alias: "Demo — Frigate pessoa auto reset"
+    trigger:
+      - platform: state
+        entity_id: input_boolean.demo_frigate_person
+        to: "on"
+        for:
+          seconds: 15
+    action:
+      - service: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.demo_frigate_person
+    mode: single

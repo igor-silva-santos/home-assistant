@@ -409,3 +409,19 @@
       icon: mdi:garage
       icon_color: >
         {% if is_state('binary_sensor.frigate_camera_03_motion','on') %}red{% else %}green{% endif %}
+
+# ── Simulação (modo demo) ─────────────────────────────────────
+- type: entities
+  title: "Simular câmeras / Frigate (demo)"
+  show_header_toggle: false
+  entities:
+    - entity: input_boolean.demo_motion_cam_01
+      name: Movimento — Entrada
+    - entity: input_boolean.demo_motion_cam_02
+      name: Movimento — Quintal
+    - entity: input_boolean.demo_motion_cam_03
+      name: Movimento — Garagem
+    - entity: input_boolean.demo_motion_cam_04
+      name: Movimento — Sala
+    - entity: input_boolean.demo_frigate_person
+      name: Detecção pessoa (Frigate)
