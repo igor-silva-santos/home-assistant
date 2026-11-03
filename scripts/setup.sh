@@ -131,6 +131,7 @@ declare -A REQUIRED_CARDS=(
   ["layout-card"]="Layout Card — https://github.com/thomasloven/lovelace-layout-card"
   ["card-mod"]="Card Mod — https://github.com/thomasloven/lovelace-card-mod"
   ["mini-graph-card"]="Mini Graph Card — https://github.com/kalkih/mini-graph-card"
+  ["auto-entities"]="Auto Entities — https://github.com/juanmc2005/AutoEntities"
 )
 
 echo -e "${CYAN}🔍 Integração NextFloor (3D)...${RESET}"

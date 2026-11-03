@@ -41,6 +41,12 @@ views:
     icon: mdi:floor-plan
     cards: !include lovelace/views/comodos.yaml
 
+  # ── 3b. Cômodos (automático por Área) ─────────────────────
+  - title: "Por área"
+    path: comodos-auto
+    icon: mdi:home-group
+    cards: !include lovelace/views/comodos-auto.yaml
+
   # ── 4. Energia ────────────────────────────────────────────
   - title: "Energia"
     path: energia

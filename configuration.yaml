@@ -34,6 +34,8 @@ lovelace:
     #   type: module
     # - url: /hacsfiles/mini-graph-card/mini-graph-card-bundle.js
     #   type: module
+    # - url: /hacsfiles/auto-entities/auto-entities.js
+    #   type: module
 
 # ── Temas ────────────────────────────────────────────────────
 frontend:
