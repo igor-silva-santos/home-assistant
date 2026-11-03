@@ -1,0 +1,28 @@
+# ══════════════════════════════════════════════════════════════
+#  Exemplos — Energy Dashboard / utility_meter
+#  Use via UI (Configurações → Energia) quando possível
+# ══════════════════════════════════════════════════════════════
+
+# utility_meter:
+#   energia_diaria:
+#     source: sensor.seu_medidor_kwh
+#     cycle: daily
+#   energia_mensal:
+#     source: sensor.seu_medidor_kwh
+#     cycle: monthly
+
+# template:
+#   - sensor:
+#       - name: "consumo_diario_kwh"
+#         unique_id: prod_consumo_diario
+#         unit_of_measurement: "kWh"
+#         device_class: energy
+#         state_class: total_increasing
+#         state: "{{ states('sensor.energia_diaria') }}"
+
+# sensor:
+#   - platform: integration
+#     source: sensor.plug_sala_power
+#     name: consumo_sala_energy
+#     unit_prefix: k
+#     round: 2

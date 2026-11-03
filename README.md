@@ -32,7 +32,7 @@ Setup de Home Assistant com Docker, dashboards Lovelace, Frigate e monitoramento
 4. Instale custom cards via HACS (ver `docs/CUSTOM-CARDS.md`)
 5. Ative o tema desejado no perfil
 
-Detalhes: [`docs/SETUP.md`](./docs/SETUP.md) · [`docs/CONNECT-HA-3D.md`](./docs/CONNECT-HA-3D.md) · [`docs/DEPLOY-CHECKLIST.md`](./docs/DEPLOY-CHECKLIST.md) · [`docs/DOCKER-VPS.md`](./docs/DOCKER-VPS.md)
+Detalhes: [`docs/SETUP.md`](./docs/SETUP.md) · [`docs/CONNECT-HA-3D.md`](./docs/CONNECT-HA-3D.md) · [`docs/ENERGY-DASHBOARD.md`](./docs/ENERGY-DASHBOARD.md) · [`docs/DEPLOY-CHECKLIST.md`](./docs/DEPLOY-CHECKLIST.md) · [`docs/DOCKER-VPS.md`](./docs/DOCKER-VPS.md)
 
 ## Roadmap
 
