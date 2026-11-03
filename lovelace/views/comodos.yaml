@@ -16,6 +16,7 @@
   icon: mdi:sofa-single
   show_header: true
   layout: grid
+  navigate_to_3d: /lovelace/planta3d
   entities:
     - entity: light.sala_principal
       name: "Luz Principal"
@@ -48,6 +49,7 @@
   icon: mdi:bed-king-outline
   show_header: true
   layout: grid
+  navigate_to_3d: /lovelace/planta3d
   entities:
     - entity: light.quarto_principal
       name: "Luz Principal"
@@ -81,6 +83,7 @@
   icon: mdi:chef-hat
   show_header: true
   layout: grid
+  navigate_to_3d: /lovelace/planta3d
   entities:
     - entity: light.cozinha
       name: "Luz Cozinha"
@@ -113,6 +116,7 @@
   icon: mdi:shower-head
   show_header: true
   layout: grid
+  navigate_to_3d: /lovelace/planta3d
   entities:
     - entity: light.banheiro
       name: "Luz Banheiro"
@@ -142,6 +146,7 @@
   icon: mdi:desk-lamp
   show_header: true
   layout: grid
+  navigate_to_3d: /lovelace/planta3d
   entities:
     - entity: light.escritorio
       name: "Luz Escritório"
@@ -175,6 +180,7 @@
   icon: mdi:tree-outline
   show_header: true
   layout: grid
+  navigate_to_3d: /lovelace/planta3d
   entities:
     - entity: light.area_externa
       name: "Luz Área"

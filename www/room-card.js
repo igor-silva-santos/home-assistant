@@ -1,7 +1,7 @@
 /**
  * ╔══════════════════════════════════════════════════════════╗
  * ║  ROOM CARD — Card Modular de Cômodo                      ║
- * ║  Versão: 2.1  |  Home Assistant Custom Card              ║
+ * ║  Versão: 2.2  |  Home Assistant Custom Card              ║
  * ╚══════════════════════════════════════════════════════════╝
  *
  * Configuração YAML:
@@ -19,6 +19,8 @@
  *     - entity: sensor.temperatura_sala
  *       name: "Temperatura"
  *   navigate_to: /lovelace/comodos
+ *   navigate_to_3d: /lovelace/planta3d
+ *   nextfloor_room: room_abc123   # opcional — ID do editor NextFloor
  */
 
 class RoomCard extends HTMLElement {
@@ -36,6 +38,8 @@ class RoomCard extends HTMLElement {
       icon: config.icon || "mdi:home",
       entities: config.entities || [],
       navigate_to: config.navigate_to || null,
+      navigate_to_3d: config.navigate_to_3d || null,
+      nextfloor_room: config.nextfloor_room || null,
       show_header: config.show_header !== false,
       layout: config.layout || "compact",
     };
@@ -183,6 +187,25 @@ class RoomCard extends HTMLElement {
         }
         .master-toggle:hover { border-color: rgba(0,212,255,0.6); }
 
+        .header-actions { display: flex; align-items: center; gap: 8px; }
+        .btn-3d {
+          width: 32px; height: 32px;
+          border-radius: 10px;
+          border: 1px solid rgba(0,212,255,0.35);
+          background: rgba(0,212,255,0.08);
+          color: #00d4ff;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.85rem;
+          transition: all 0.2s;
+        }
+        .btn-3d:hover {
+          background: rgba(0,212,255,0.18);
+          box-shadow: 0 0 12px rgba(0,212,255,0.35);
+        }
+
         .devices-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -283,7 +306,14 @@ class RoomCard extends HTMLElement {
               </div>
             </div>
           </div>
-          <div class="master-toggle" id="masterToggle" title="${roomActive ? "Desligar tudo" : "Ligar tudo"}"></div>
+          <div class="header-actions">
+            ${
+              this._config.navigate_to_3d
+                ? `<button type="button" class="btn-3d" id="nav3d" title="Abrir planta 3D">3D</button>`
+                : ""
+            }
+            <div class="master-toggle" id="masterToggle" title="${roomActive ? "Desligar tudo" : "Ligar tudo"}"></div>
+          </div>
         </div>
 
         <div class="divider"></div>
@@ -312,6 +342,19 @@ class RoomCard extends HTMLElement {
           this._hass?.callService(domain, service, { entity_id: e.entity });
         }
       });
+    });
+
+    this.shadowRoot.querySelector("#nav3d")?.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      if (this._config.nextfloor_room) {
+        try {
+          sessionStorage.setItem("nextfloor_start_room", this._config.nextfloor_room);
+        } catch (_) {
+          /* ignore */
+        }
+      }
+      history.pushState(null, "", this._config.navigate_to_3d);
+      window.dispatchEvent(new PopStateEvent("popstate"));
     });
 
     // Navigate on header tap
