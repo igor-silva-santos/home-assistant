@@ -71,6 +71,7 @@ mkdir -p "$HA_CONFIG_DIR/themes"
 mkdir -p "$HA_CONFIG_DIR/www"
 mkdir -p "$HA_CONFIG_DIR/lovelace/views"
 mkdir -p "$HA_CONFIG_DIR/lovelace/cards"
+mkdir -p "$HA_CONFIG_DIR/packages"
 mkdir -p "$HA_CONFIG_DIR/docs"
 
 # Copiar themes
@@ -83,7 +84,10 @@ cp "$PROJECT_DIR/www/"*.js "$HA_CONFIG_DIR/www/" 2>/dev/null && \
 
 # Copiar views Lovelace
 cp "$PROJECT_DIR/lovelace/views/"*.yaml "$HA_CONFIG_DIR/lovelace/views/" 2>/dev/null && \
-  echo -e "   ${GREEN}✅ Views Lovelace copiadas (home, comodos, energia, relatorios, automacoes, seguranca, config)${RESET}"
+  echo -e "   ${GREEN}✅ Views Lovelace copiadas (home, planta3d, kiosk, comodos, …)${RESET}"
+
+cp "$PROJECT_DIR/packages/"*.yaml "$HA_CONFIG_DIR/packages/" 2>/dev/null && \
+  echo -e "   ${GREEN}✅ Pacotes demo copiados (packages/)${RESET}"
 
 # Copiar cards YAML
 cp "$PROJECT_DIR/lovelace/cards/"*.yaml "$HA_CONFIG_DIR/lovelace/cards/" 2>/dev/null && \
@@ -128,6 +132,13 @@ declare -A REQUIRED_CARDS=(
   ["card-mod"]="Card Mod — https://github.com/thomasloven/lovelace-card-mod"
   ["mini-graph-card"]="Mini Graph Card — https://github.com/kalkih/mini-graph-card"
 )
+
+echo -e "${CYAN}🔍 Integração NextFloor (3D)...${RESET}"
+if [ -d "$HA_CONFIG_DIR/custom_components/nextfloor" ]; then
+  echo -e "   ${GREEN}✅ NextFloor instalado${RESET}"
+else
+  echo -e "   ${YELLOW}⚠️  NextFloor não encontrado — ver docs/CONNECT-HA-3D.md${RESET}"
+fi
 
 ALL_CARDS_OK=true
 for card in "${!REQUIRED_CARDS[@]}"; do

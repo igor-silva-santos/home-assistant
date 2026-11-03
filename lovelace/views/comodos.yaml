@@ -53,15 +53,15 @@
       name: "Luz Principal"
       icon: mdi:ceiling-light
       show_brightness: true
-    - entity: light.quarto_bedside
-      name: "Cabeceira"
-      icon: mdi:lamp
-      show_brightness: true
-    - entity: switch.ar_condicionado_quarto
-      name: "Ar Condicionado"
-      icon: mdi:air-conditioner
-      show_power: true
-    - entity: sensor.temperatura_quarto
+        - entity: light.quarto_bedside
+          name: "Cabeceira"
+          icon: mdi:lamp
+          show_brightness: true
+        - entity: climate.ar_condicionado_quarto
+          name: "Ar Condicionado"
+          icon: mdi:air-conditioner
+          show_temperature: true
+        - entity: sensor.temperatura_quarto
       name: "Temperatura"
       icon: mdi:thermometer
       type: sensor

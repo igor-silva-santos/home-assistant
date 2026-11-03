@@ -1,0 +1,79 @@
+# ══════════════════════════════════════════════════════════════
+#  VIEW: PLANTA 3D — NextFloor + cenas rápidas
+#  Requer integração NextFloor (HACS) — ver docs/CONNECT-HA-3D.md
+# ══════════════════════════════════════════════════════════════
+
+- type: markdown
+  content: >
+    **Planta 3D** — Após instalar o NextFloor (HACS), desenhe sua casa no painel
+    *NextFloor → Editor* e vincule lâmpidas/ACs às entidades reais (ou demo).
+    Enquanto isso, use as cenas abaixo e o card 3D assim que a integração estiver ativa.
+
+- type: horizontal-stack
+  cards:
+    - type: button
+      name: Brilho
+      icon: mdi:brightness-7
+      tap_action:
+        action: call-service
+        service: scene.turn_on
+        service_data:
+          entity_id: scene.brilho
+    - type: button
+      name: Aconchego
+      icon: mdi:sofa
+      tap_action:
+        action: call-service
+        service: scene.turn_on
+        service_data:
+          entity_id: scene.acconchego
+    - type: button
+      name: Filme
+      icon: mdi:movie-open
+      tap_action:
+        action: call-service
+        service: scene.turn_on
+        service_data:
+          entity_id: scene.filme
+    - type: button
+      name: Noite
+      icon: mdi:weather-night
+      tap_action:
+        action: call-service
+        service: scene.turn_on
+        service_data:
+          entity_id: scene.noite
+
+- type: custom:nextfloor-card
+  theme: neon
+  accent: "#00d4ff"
+  quality: auto
+  height: 520
+  explode: true
+  room_panel: true
+  scenes: true
+  alerts: true
+  energy: false
+  card_mod:
+    style: |
+      ha-card {
+        border: 1px solid rgba(0,212,255,0.25) !important;
+        border-radius: 16px !important;
+        overflow: hidden !important;
+      }
+
+- type: entities
+  title: "Testar integração (modo demo)"
+  show_header_toggle: false
+  entities:
+    - entity: input_boolean.demo_campainha
+      name: Simular campainha
+    - entity: input_boolean.demo_movimento_sala
+      name: Movimento na sala
+    - entity: input_boolean.demo_porteira_trancada
+      name: Porteira trancada
+    - type: divider
+    - type: section
+      label: Cômodos (room-card na aba Cômodos)
+    - entity: light.sala_principal
+    - entity: switch.tv_sala

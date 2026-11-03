@@ -80,7 +80,11 @@ cp automations.yaml /config/
 
 ---
 
-## Passo 5 — Configurar entidades
+### Passo 4 — Configurar entidades
+
+**Modo demo (sem hardware):** mantenha `homeassistant.packages` em `configuration.yaml` — luzes e switches simulados já funcionam.
+
+**Produção:** siga [`docs/ENTITY-MAP.md`](./ENTITY-MAP.md) e [`docs/CONNECT-HA-3D.md`](./CONNECT-HA-3D.md).
 
 Edite `configuration.yaml` e substitua os placeholders pelas suas entidades reais:
 

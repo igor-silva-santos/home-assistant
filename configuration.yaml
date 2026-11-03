@@ -3,6 +3,13 @@
 #  Dashboard Futurista  |  Versão 2.0
 # ══════════════════════════════════════════════════════════════
 
+# ── Núcleo + pacotes demo (entidades simuladas) ───────────────
+# Remova ou comente `packages` ao mapear hardware real — ver docs/ENTITY-MAP.md
+default_config:
+
+homeassistant:
+  packages: !include_dir_named packages
+
 # ── Dashboard Lovelace ────────────────────────────────────────
 lovelace:
   mode: yaml
@@ -158,7 +165,7 @@ template:
 automation: !include automations.yaml
 
 # ── Scripts ──────────────────────────────────────────────────
-script: !include_dir_merge_named scripts/
+# script: !include_dir_merge_named scripts/homeassistant/
 
 # ── Notificações ─────────────────────────────────────────────
 # notify:

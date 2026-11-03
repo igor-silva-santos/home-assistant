@@ -1,7 +1,7 @@
 /**
  * ╔══════════════════════════════════════════════════════════╗
  * ║  ROOM CARD — Card Modular de Cômodo                      ║
- * ║  Versão: 2.0  |  Home Assistant Custom Card              ║
+ * ║  Versão: 2.1  |  Home Assistant Custom Card              ║
  * ╚══════════════════════════════════════════════════════════╝
  *
  * Configuração YAML:
@@ -52,7 +52,12 @@ class RoomCard extends HTMLElement {
 
   _isOn(entityId) {
     const state = this._getState(entityId);
-    return state && (state.state === "on" || state.state === "unlocked" || state.state === "open");
+    if (!state) return false;
+    const domain = entityId.split(".")[0];
+    if (domain === "climate") {
+      return state.state && !["off", "unavailable", "unknown"].includes(state.state);
+    }
+    return state.state === "on" || state.state === "unlocked" || state.state === "open";
   }
 
   _getActiveCount() {
@@ -64,6 +69,17 @@ class RoomCard extends HTMLElement {
 
   _toggleEntity(entityId) {
     const domain = entityId.split(".")[0];
+    if (domain === "climate") {
+      const st = this._getState(entityId);
+      const modes = st?.attributes?.hvac_modes || ["off", "cool"];
+      if (this._isOn(entityId)) {
+        this._hass?.callService("climate", "set_hvac_mode", { entity_id: entityId, hvac_mode: "off" });
+      } else {
+        const next = modes.find((m) => m !== "off") || "cool";
+        this._hass?.callService("climate", "set_hvac_mode", { entity_id: entityId, hvac_mode: next });
+      }
+      return;
+    }
     const serviceMap = {
       light: "toggle",
       switch: "toggle",
@@ -74,6 +90,13 @@ class RoomCard extends HTMLElement {
     this._hass?.callService(domain, service, { entity_id: entityId });
   }
 
+  _setClimateTemperature(entityId, temperature) {
+    this._hass?.callService("climate", "set_temperature", {
+      entity_id: entityId,
+      temperature: parseFloat(temperature),
+    });
+  }
+
   _setBrightness(entityId, brightness) {
     this._hass?.callService("light", "turn_on", { entity_id: entityId, brightness: Math.round(brightness * 2.55) });
   }
@@ -82,7 +105,7 @@ class RoomCard extends HTMLElement {
     const activeCount = this._getActiveCount();
     const totalDevices = this._config.entities.filter((e) => {
       const domain = e.entity.split(".")[0];
-      return ["light", "switch", "media_player", "fan"].includes(domain);
+      return ["light", "switch", "media_player", "fan", "climate"].includes(domain);
     }).length;
 
     const roomActive = activeCount > 0;
@@ -274,10 +297,18 @@ class RoomCard extends HTMLElement {
     // Master toggle
     this.shadowRoot.querySelector("#masterToggle")?.addEventListener("click", (ev) => {
       ev.stopPropagation();
-      const service = roomActive ? "turn_off" : "turn_on";
       this._config.entities.forEach((e) => {
         const domain = e.entity.split(".")[0];
+        if (domain === "climate") {
+          if (roomActive && this._isOn(e.entity)) {
+            this._hass?.callService("climate", "set_hvac_mode", { entity_id: e.entity, hvac_mode: "off" });
+          } else if (!roomActive && !this._isOn(e.entity)) {
+            this._toggleEntity(e.entity);
+          }
+          return;
+        }
         if (["light", "switch", "fan", "media_player"].includes(domain)) {
+          const service = roomActive ? "turn_off" : "turn_on";
           this._hass?.callService(domain, service, { entity_id: e.entity });
         }
       });
@@ -298,10 +329,16 @@ class RoomCard extends HTMLElement {
       el.addEventListener("click", () => this._toggleEntity(el.dataset.entity));
     });
 
-    // Sliders
+    // Sliders (brightness + AC target)
     this.shadowRoot.querySelectorAll("input[type=range]").forEach((slider) => {
       slider.addEventListener("change", (e) => {
-        this._setBrightness(e.target.dataset.entity, parseInt(e.target.value));
+        const ent = e.target.dataset.entity;
+        const kind = e.target.dataset.kind || "brightness";
+        if (kind === "climate") {
+          this._setClimateTemperature(ent, e.target.value);
+        } else {
+          this._setBrightness(ent, parseInt(e.target.value, 10));
+        }
         e.target.style.setProperty("--val", `${e.target.value}%`);
       });
       slider.addEventListener("input", (e) => {
@@ -311,20 +348,20 @@ class RoomCard extends HTMLElement {
   }
 
   _renderDevice(entityConfig) {
-    const { entity, name, show_brightness, show_power, type: devType } = entityConfig;
+    const { entity, name, show_brightness, show_power, show_temperature, type: devType } = entityConfig;
     const state = this._getState(entity);
     const domain = entity.split(".")[0];
     const isSensor = domain === "sensor" || domain === "binary_sensor" || devType === "sensor";
     const active = !isSensor && this._isOn(entity);
 
     const iconMap = {
-      "light": active ? "💡" : "🔦",
-      "switch": active ? "🔌" : "⚡",
-      "media_player": active ? "📺" : "📺",
-      "fan": active ? "🌀" : "💨",
-      "sensor": "🌡️",
-      "binary_sensor": state?.state === "on" ? "🔴" : "🟢",
-      "climate": "❄️",
+      light: active ? "💡" : "🔦",
+      switch: active ? "🔌" : "⚡",
+      media_player: active ? "📺" : "📺",
+      fan: active ? "🌀" : "💨",
+      sensor: "🌡️",
+      binary_sensor: state?.state === "on" ? "🔴" : "🟢",
+      climate: active ? "❄️" : "🌡️",
     };
     const icon = entityConfig.icon ? `<ha-icon icon="${entityConfig.icon}" style="--mdc-icon-size:1.4rem"></ha-icon>` : (iconMap[domain] || "🔧");
 
@@ -336,6 +373,22 @@ class RoomCard extends HTMLElement {
         <div class="slider-container">
           <input type="range" min="1" max="100" value="${val}"
             style="--val:${val}%"
+            data-kind="brightness"
+            data-entity="${entity}" />
+        </div>
+      `;
+    }
+
+    if (show_temperature && domain === "climate") {
+      const minT = state?.attributes?.min_temp ?? 16;
+      const maxT = state?.attributes?.max_temp ?? 30;
+      const target = state?.attributes?.temperature ?? state?.attributes?.target_temp_low ?? 23;
+      const pct = Math.round(((target - minT) / (maxT - minT)) * 100);
+      brightnessSlider = `
+        <div class="slider-container">
+          <input type="range" min="${minT}" max="${maxT}" step="1" value="${target}"
+            style="--val:${pct}%"
+            data-kind="climate"
             data-entity="${entity}" />
         </div>
       `;
@@ -346,6 +399,14 @@ class RoomCard extends HTMLElement {
       const val = state?.state || "—";
       const unit = state?.attributes?.unit_of_measurement || "";
       stateText = `<div class="sensor-value">${val} ${unit}</div>`;
+    } else if (domain === "climate") {
+      const cur = state?.attributes?.current_temperature;
+      const tgt = state?.attributes?.temperature;
+      const mode = state?.state || "off";
+      stateText = `<div class="device-state">${active ? mode : "Desligado"}</div>`;
+      if (cur != null) {
+        stateText += `<div class="device-state">${cur}° → ${tgt ?? "—"}°</div>`;
+      }
     } else {
       stateText = `<div class="device-state">${active ? "Ligado" : "Desligado"}</div>`;
       if (show_power && state?.attributes?.watt) {
@@ -372,6 +433,7 @@ class RoomCard extends HTMLElement {
       entities: [
         { entity: "light.sala_principal", name: "Luz", show_brightness: true },
         { entity: "switch.tv_sala", name: "TV" },
+        { entity: "climate.ar_condicionado_quarto", name: "Ar", show_temperature: true },
         { entity: "sensor.temperatura_sala", name: "Temperatura" },
       ],
     };
@@ -385,6 +447,6 @@ window.customCards = window.customCards || [];
 window.customCards.push({
   type: "room-card",
   name: "Room Card — Cômodo Modular",
-  description: "Card modular de cômodo com grid de dispositivos, toggle master, brilho e sensores.",
+  description: "Card modular de cômodo com grid de dispositivos, toggle master, brilho, clima e sensores.",
   preview: true,
 });

@@ -159,6 +159,73 @@
             border: 1px solid rgba(0,255,136,0.15) !important;
           }
 
+# ── Cenas rápidas (estilo publicação) ─────────────────────────
+- type: custom:mushroom-title-card
+  title: "Cenas"
+  subtitle: "Ambiente com um toque"
+  card_mod:
+    style: |
+      ha-card { background: transparent !important; border: none !important; margin-top: 8px !important; }
+
+- type: horizontal-stack
+  cards:
+    - type: button
+      name: Brilho
+      icon: mdi:brightness-7
+      tap_action:
+        action: call-service
+        service: scene.turn_on
+        service_data:
+          entity_id: scene.brilho
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(255,215,0,0.12), transparent) !important;
+            border: 1px solid rgba(255,215,0,0.35) !important;
+          }
+    - type: button
+      name: Aconchego
+      icon: mdi:sofa
+      tap_action:
+        action: call-service
+        service: scene.turn_on
+        service_data:
+          entity_id: scene.acconchego
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(255,140,0,0.1), transparent) !important;
+            border: 1px solid rgba(255,140,0,0.3) !important;
+          }
+    - type: button
+      name: Filme
+      icon: mdi:movie-open
+      tap_action:
+        action: call-service
+        service: scene.turn_on
+        service_data:
+          entity_id: scene.filme
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(123,47,255,0.12), transparent) !important;
+            border: 1px solid rgba(123,47,255,0.35) !important;
+          }
+    - type: button
+      name: Noite
+      icon: mdi:weather-night
+      tap_action:
+        action: call-service
+        service: scene.turn_on
+        service_data:
+          entity_id: scene.noite
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(0,212,255,0.08), transparent) !important;
+            border: 1px solid rgba(0,212,255,0.25) !important;
+          }
+
 # ── LINHA 2: Módulos especiais ────────────────────────────────
 - type: horizontal-stack
   cards:
@@ -238,7 +305,7 @@
       entities:
         - entity: light.quarto_principal
           name: "Luz"
-        - entity: switch.ar_condicionado_quarto
+        - entity: climate.ar_condicionado_quarto
           name: "Ar Condicionado"
         - entity: sensor.temperatura_quarto
           name: "Temperatura"

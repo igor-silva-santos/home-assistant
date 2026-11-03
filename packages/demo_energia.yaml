@@ -1,0 +1,125 @@
+# ══════════════════════════════════════════════════════════════
+#  Sensores de energia simulados (views Energia / Relatórios)
+# ══════════════════════════════════════════════════════════════
+
+template:
+  - sensor:
+      - name: "Consumo Diario Kwh"
+        unique_id: demo_consumo_diario_kwh
+        unit_of_measurement: "kWh"
+        device_class: energy
+        state_class: measurement
+        state: >
+          {% set base = 8.5 %}
+          {% set extra = (states.light | selectattr('state','eq','on') | list | count) * 0.15 %}
+          {{ (base + extra) | round(2) }}
+
+      - name: "Consumo Mes Kwh"
+        unique_id: demo_consumo_mes_kwh
+        unit_of_measurement: "kWh"
+        device_class: energy
+        state: "{{ (states('sensor.consumo_diario_kwh') | float(0) * 3.2) | round(1) }}"
+
+      - name: "Consumo Dispositivo 1"
+        unique_id: demo_consumo_dispositivo_1
+        unit_of_measurement: "kWh"
+        state: "2.4"
+      - name: "Consumo Dispositivo 2"
+        unique_id: demo_consumo_dispositivo_2
+        unit_of_measurement: "kWh"
+        state: "1.1"
+      - name: "Consumo Dispositivo 3"
+        unique_id: demo_consumo_dispositivo_3
+        unit_of_measurement: "kWh"
+        state: "0.8"
+
+      - name: "Consumo Ar Condicionado"
+        unique_id: demo_consumo_ar
+        unit_of_measurement: "kWh"
+        state: "{{ 1.8 if states('climate.ar_condicionado_quarto') not in ['off', 'unavailable', 'unknown'] else 0.2 }}"
+      - name: "Consumo Geladeira"
+        unique_id: demo_consumo_geladeira
+        unit_of_measurement: "kWh"
+        state: "0.9"
+      - name: "Consumo Tv Sala"
+        unique_id: demo_consumo_tv
+        unit_of_measurement: "kWh"
+        state: "{{ 0.6 if is_state('switch.tv_sala','on') else 0.05 }}"
+      - name: "Consumo Computador"
+        unique_id: demo_consumo_pc
+        unit_of_measurement: "kWh"
+        state: "{{ 0.4 if is_state('switch.computador','on') else 0.02 }}"
+      - name: "Consumo Lava Loucas"
+        unique_id: demo_consumo_lava
+        unit_of_measurement: "kWh"
+        state: "0.3"
+      - name: "Consumo Microondas"
+        unique_id: demo_consumo_micro
+        unit_of_measurement: "kWh"
+        state: "0.15"
+      - name: "Consumo Aquecedor"
+        unique_id: demo_consumo_aquecedor
+        unit_of_measurement: "kWh"
+        state: "{{ 0.7 if is_state('switch.aquecedor_banheiro','on') else 0.1 }}"
+      - name: "Consumo Som"
+        unique_id: demo_consumo_som
+        unit_of_measurement: "kWh"
+        state: "{{ 0.25 if is_state('switch.som_sala','on') else 0.01 }}"
+      - name: "Consumo Luzes Total"
+        unique_id: demo_consumo_luzes
+        unit_of_measurement: "kWh"
+        state: "{{ (states.light | selectattr('state','eq','on') | list | count) * 0.08 | round(2) }}"
+      - name: "Consumo Outros"
+        unique_id: demo_consumo_outros
+        unit_of_measurement: "kWh"
+        state: "0.55"
+
+      - name: "Consumo Semana Passada Kwh"
+        unique_id: demo_consumo_semana_passada
+        unit_of_measurement: "kWh"
+        state: "{{ (states('sensor.consumo_diario_kwh') | float(0) * 6.5) | round(1) }}"
+
+      - name: "Consumo Medio Diario Kwh"
+        unique_id: demo_consumo_medio_diario
+        unit_of_measurement: "kWh"
+        state: "{{ (states('sensor.consumo_diario_kwh') | float(0) * 0.95) | round(2) }}"
+
+      - name: "Consumo Ativo Kwh"
+        unique_id: demo_consumo_ativo
+        unit_of_measurement: "kWh"
+        state: "{{ (states('sensor.consumo_diario_kwh') | float(0) * 0.7) | round(2) }}"
+      - name: "Consumo Standby Kwh"
+        unique_id: demo_consumo_standby
+        unit_of_measurement: "kWh"
+        state: "{{ (states('sensor.consumo_diario_kwh') | float(0) * 0.3) | round(2) }}"
+
+      - name: "Horas Ligado Ar Condicionado"
+        unique_id: demo_horas_ar
+        unit_of_measurement: "h"
+        state: "{{ 4 if states('climate.ar_condicionado_quarto') not in ['off', 'unavailable', 'unknown'] else 1 }}"
+      - name: "Horas Ligado Computador"
+        unique_id: demo_horas_pc
+        unit_of_measurement: "h"
+        state: "{{ 6 if is_state('switch.computador','on') else 0 }}"
+      - name: "Horas Ligado Tv"
+        unique_id: demo_horas_tv
+        unit_of_measurement: "h"
+        state: "{{ 3 if is_state('switch.tv_sala','on') else 0 }}"
+      - name: "Horas Ligado Luzes"
+        unique_id: demo_horas_luzes
+        unit_of_measurement: "h"
+        state: "{{ states.light | selectattr('state','eq','on') | list | count }}"
+
+  - binary_sensor:
+      - name: "Tv Sala Ligada"
+        unique_id: demo_bin_tv
+        state: "{{ is_state('switch.tv_sala', 'on') }}"
+      - name: "Computador Ligado"
+        unique_id: demo_bin_pc
+        state: "{{ is_state('switch.computador', 'on') }}"
+      - name: "Ar Condicionado Ligado"
+        unique_id: demo_bin_ar
+        state: "{{ states('climate.ar_condicionado_quarto') not in ['off', 'unavailable', 'unknown'] }}"
+      - name: "Luz Cozinha Sem Movimento"
+        unique_id: demo_luz_coz_sem_mov
+        state: "{{ is_state('light.cozinha','on') }}"
