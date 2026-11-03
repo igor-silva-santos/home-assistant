@@ -1,0 +1,9 @@
+# Link opcional na view Energia — abrir painel nativo
+# Adicione a energia.yaml se quiser atalho:
+
+# - type: button
+#   name: Painel Energia HA
+#   icon: mdi:lightning-bolt
+#   tap_action:
+#     action: navigate
+#     navigation_path: /energy
