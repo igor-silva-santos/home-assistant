@@ -70,6 +70,9 @@ Com `homeassistant.packages` ativo, estas entidades existem via templates:
 | input_select.modo_casa | configuration.yaml | Modos |
 | input_number.tarifa_kwh | configuration.yaml | Energia |
 | climate.ar_condicionado_quarto | demo_casa (template) | Cômodos → slider °C |
+| camera.camera_01 … camera_04 | demo_seguranca | Segurança → live view |
+| binary_sensor.frigate_camera_*_motion | demo_seguranca | Segurança → zonas |
+| sensor.frigate_detections_today | demo_seguranca | Contador Frigate |
 
 ## Minhas entidades (produção)
 
