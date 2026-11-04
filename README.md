@@ -32,7 +32,7 @@ Setup de Home Assistant com Docker, dashboards Lovelace, Frigate e monitoramento
 4. Instale custom cards via HACS (ver `docs/CUSTOM-CARDS.md`)
 5. Ative o tema desejado no perfil
 
-Detalhes: [`docs/SETUP.md`](./docs/SETUP.md) · [`docs/CONNECT-HA-3D.md`](./docs/CONNECT-HA-3D.md) · [`docs/DEPLOY-CHECKLIST.md`](./docs/DEPLOY-CHECKLIST.md) · [`docs/DOCKER-VPS.md`](./docs/DOCKER-VPS.md)
+Detalhes: [`docs/SETUP.md`](./docs/SETUP.md) · [`docs/KIOSK-TABLET.md`](./docs/KIOSK-TABLET.md) · [`docs/CONNECT-HA-3D.md`](./docs/CONNECT-HA-3D.md) · [`docs/DEPLOY-CHECKLIST.md`](./docs/DEPLOY-CHECKLIST.md) · [`docs/DOCKER-VPS.md`](./docs/DOCKER-VPS.md)
 
 ## Roadmap
 
@@ -42,7 +42,7 @@ Detalhes: [`docs/SETUP.md`](./docs/SETUP.md) · [`docs/CONNECT-HA-3D.md`](./docs
 - [ ] Aceleração Coral TPU no Frigate
 - [ ] Energy Dashboard nativo
 - [ ] Mais dispositivos Matter
-- [ ] Modo kiosk para tablet de parede
+- [ ] Modo kiosk para tablet de parede — [`docs/KIOSK-TABLET.md`](./docs/KIOSK-TABLET.md)
 
 ---
 

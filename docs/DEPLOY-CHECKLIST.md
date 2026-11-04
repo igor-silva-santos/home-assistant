@@ -30,6 +30,7 @@ Descomente entradas em `configuration.yaml` → `lovelace.resources` após insta
 - [ ] **Cômodos** → `light.sala_principal` liga/desliga no room-card
 - [ ] **Cômodos** → **Quarto** → slider do **Ar Condicionado** (climate) muda alvo °C
 - [ ] **Planta 3D** → card NextFloor carrega (não “custom element missing”)
+- [ ] **Kiosk** — usuário tablet + URL `/lovelace/kiosk` — [`KIOSK-TABLET.md`](./KIOSK-TABLET.md)
 - [ ] **Planta 3D** → `Simular campainha` acende alerta na Home
 
 ## Validação automática

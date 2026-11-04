@@ -126,6 +126,33 @@
       icon: mdi:home-assistant
       icon_color: cyan
 
+- type: custom:mushroom-title-card
+  title: "📱 Tablet / Kiosk"
+
+- type: horizontal-stack
+  cards:
+    - type: button
+      name: Modo Kiosk
+      icon: mdi:tablet-dashboard
+      tap_action:
+        action: navigate
+        navigation_path: /lovelace/kiosk
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, rgba(0,212,255,0.12) 0%, transparent 100%) !important;
+            border: 1px solid rgba(0,212,255,0.35) !important;
+          }
+    - type: button
+      name: Planta 3D
+      icon: mdi:home-floor-3
+      tap_action:
+        action: navigate
+        navigation_path: /lovelace/planta3d
+      card_mod:
+        style: |
+          ha-card { border: 1px solid #1a2744 !important; }
+
 # ── Ações rápidas ─────────────────────────────────────────────
 - type: custom:mushroom-title-card
   title: "⚡ Ações de Sistema"
