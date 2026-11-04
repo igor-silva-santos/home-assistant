@@ -1,0 +1,18 @@
+# ══════════════════════════════════════════════════════════════
+#  EXEMPLO — scripts/helpers para tablet kiosk
+#  Copie para packages/kiosk_tablet.yaml (remove .example)
+# ══════════════════════════════════════════════════════════════
+
+# script:
+#   abrir_kiosk:
+#     alias: "Abrir dashboard Kiosk"
+#     sequence:
+#       - service: frontend.set_theme
+#         data:
+#           name: futuristic_dark
+#       - service: browser_mod.navigate
+#         data:
+#           path: /lovelace/kiosk
+#     mode: single
+#
+# Nota: browser_mod é opcional (HACS). No tablet use URL fixa no Fully Kiosk.

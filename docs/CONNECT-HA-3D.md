@@ -118,4 +118,8 @@ O projeto [house-control-android](https://github.com/0xProbabillity/house-contro
 
 ---
 
+## Tablet kiosk
+
+Ver [`KIOSK-TABLET.md`](./KIOSK-TABLET.md): usuário dedicado, Fully Kiosk, URL `/lovelace/kiosk`.
+
 Próximo passo recomendado no servidor: **HACS + NextFloor + reinício**, depois [`DEPLOY-CHECKLIST.md`](./DEPLOY-CHECKLIST.md).
