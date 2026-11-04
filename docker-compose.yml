@@ -125,10 +125,10 @@ services:
     image: ghcr.io/blakeblackshear/frigate:stable
     container_name: ha-frigate
     hostname: ha-frigate
-    privileged: true           # acesso à GPU/Coral TPU
-    shm_size: "256mb"          # shared memory para processamento de vídeo
+    privileged: true           # acesso à GPU/Coral TPU — ver docs/CORAL-TPU.md
+    shm_size: "512mb"          # aumente se múltiplas câmeras 1080p
     devices:
-      - /dev/bus/usb:/dev/bus/usb   # Coral USB TPU (se disponível)
+      - /dev/bus/usb:/dev/bus/usb   # Google Coral USB Edge TPU
       # - /dev/dri/renderD128        # Intel GPU (descomente se usar)
     volumes:
       - ./frigate:/config
