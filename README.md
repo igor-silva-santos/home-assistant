@@ -4,7 +4,7 @@ Setup de Home Assistant com Docker, dashboards Lovelace, Frigate e monitoramento
 
 **Código:** https://github.com/igor-silva-santos/home-assistant
 
-> **Privacidade:** este repositório é um *template/showcase*. Não versiona `.env`, tokens, senhas nem IPs reais da rede doméstica. Use `.env.example` e `!secret` no HA. Screenshots abaixo (se presentes em `docs/`) devem estar sem dados pessoais.
+> **Privacidade:** template/showcase — sem secrets no git. Use `.env.example` e `secrets.yaml` no servidor.
 
 ## Stack
 
@@ -16,33 +16,32 @@ Setup de Home Assistant com Docker, dashboards Lovelace, Frigate e monitoramento
 | Métricas | InfluxDB + Grafana |
 | Cache | Redis |
 
-## Visão do dashboard
+## Dashboard
 
-- Home com atalhos e clima
-- Cômodos com controle por ambiente
-- Energia e consumo
-- Automações
-- Segurança / câmeras (Frigate)
+| Aba | Função |
+|-----|--------|
+| Home | Cenas, cômodos, clima |
+| Planta 3D / Kiosk | NextFloor |
+| Cômodos / Por área | room-card ou auto-entities |
+| Energia · Relatórios · Segurança | Monitoramento |
 
 ## Setup rápido
 
-1. Clone o repositório no servidor
-2. Copie `.env.example` → `.env` e preencha secrets
-3. `docker compose up -d`
-4. Instale custom cards via HACS (ver `docs/CUSTOM-CARDS.md`)
-5. Ative o tema desejado no perfil
+1. Clone → `.env` a partir de `.env.example`
+2. `docker compose up -d` (ou `bash scripts/setup.sh`)
+3. HACS + integração NextFloor — ver checklist
+4. Tema **futuristic_dark** no perfil
 
-Detalhes: [`docs/SETUP.md`](./docs/SETUP.md) · [`docs/CONNECT-HA-3D.md`](./docs/CONNECT-HA-3D.md) · [`docs/DEPLOY-CHECKLIST.md`](./docs/DEPLOY-CHECKLIST.md) · [`docs/DOCKER-VPS.md`](./docs/DOCKER-VPS.md)
+**Documentação completa:** [`docs/README.md`](./docs/README.md)
 
-## Roadmap
+Atalhos: [Setup](./docs/SETUP.md) · [Conectar HA + 3D](./docs/CONNECT-HA-3D.md) · [Checklist deploy](./docs/DEPLOY-CHECKLIST.md) · [Mapa entidades](./docs/ENTITY-MAP.md)
 
-- [x] Pacote demo + mapa de entidades (`packages/`, `docs/ENTITY-MAP.md`)
-- [x] Cenas na Home + `room-card` com climate
-- [x] Template `producao.yaml.example` + checklist deploy
-- [ ] Aceleração Coral TPU no Frigate
-- [ ] Energy Dashboard nativo
-- [ ] Mais dispositivos Matter
-- [ ] Modo kiosk para tablet de parede
+## Roadmap (repo)
+
+- [x] Demo HA + Lovelace + cenas + climate no room-card
+- [x] Planta 3D / NextFloor (views + docs)
+- [x] Pacotes demo + migração produção (`ENTITY-MAP`, `producao.yaml.example`)
+- [x] Guias em PRs: Segurança, Relatórios, Influx, Matter, Kiosk, Coral, … — ver [`docs/README.md`](./docs/README.md)
 
 ---
 
