@@ -1,0 +1,19 @@
+# Exemplo Frigate — Coral USB + CPU fallback
+# Copie trechos para frigate/config.yml
+
+detectors:
+  coral:
+    type: edgetpu
+    device: usb
+  cpu1:
+    type: cpu
+
+model:
+  path: /openvino-model/ssdlite_mobilenet_v2.xml
+  width: 300
+  height: 300
+  input_tensor: nhwc
+  input_pixel_format: bgr
+  labelmap_path: /openvino-model/coco_91cl_bkgr.txt
+
+# cameras: ... (ver frigate-config.example.yml)
